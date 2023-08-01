@@ -125,6 +125,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                                 Hive.box<Transactions>('wallet_data');
                             transactionsBox.add(newTransaction);
                           }
+
+                          Navigator.pop(context);
+                          setState(() {});
                         }),
                   ],
                 ),

@@ -9,8 +9,23 @@ final transactionsBox = Hive.box<Transactions>('wallet_data');
 class ExpensesBloc {
   final List<Transactions> myExpenses = transactionsBox.values.toList();
 
+  // double calculateIncomeOutcome(TransactionType type) {
+  //   double totalMoney = 0;
+
+  //   for (var expense in myExpenses) {
+  //     if (expense.type == type) {
+  //       totalMoney += expense.price;
+  //     }
+  //   }
+
+  //   return totalMoney;
+  // }
+
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
+
+    final transactionsBox = Hive.box<Transactions>('wallet_data');
+    final List<Transactions> myExpenses = transactionsBox.values.toList();
 
     for (var expense in myExpenses) {
       if (expense.type == type) {
@@ -62,6 +77,9 @@ class ExpensesBloc {
 
   fillFilterdList() {
     filteredList = [];
+    final transactionsBox = Hive.box<Transactions>('wallet_data');
+    final List<Transactions> myExpenses = transactionsBox.values.toList();
+
     if (selectedCategory == "All") {
       filteredList = myExpenses;
     } else {

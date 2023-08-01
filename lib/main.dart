@@ -4,13 +4,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/transactions.dart';
 
-late Box box;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
 
   Hive.registerAdapter(TransactionsAdapter());
+  Hive.registerAdapter<TransactionType>(TransactionTypeAdapter());
   await Hive.openBox<Transactions>('wallet_data');
 
   runApp(const MainApp());
