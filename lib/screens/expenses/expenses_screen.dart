@@ -233,18 +233,21 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                                       // final List<Transactions> myExpenses =
                                       //     transactionsBox.values.toList();
+                                      print(bloc.filteredList[index].uniqueId);
 
                                       _showBottomSheet(
                                         ctx: context,
                                         trans: bloc.filteredList[index],
                                         onClicked: (value) {
-                                          print(bloc
-                                              .filteredList[index].uniqueId);
+                                          // print(bloc
+                                          //     .filteredList[index].uniqueId);
 
                                           bloc.transactionsBox.put(
                                               bloc.filteredList[index].uniqueId,
                                               value);
 
+                                          //comented by alena and abed
+                                          //------------------------
                                           //  )
                                           // for (int i = 0;
                                           //     i < myExpenses.length;
@@ -257,10 +260,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                           //         value);
                                           //   }
                                           // }
+                                          //------------------------
                                           bloc.fillFilterdList();
                                           setState(() {});
                                         },
                                       );
+                                      print(bloc.filteredList[index].uniqueId);
                                     },
                                     icon: const Icon(Icons.edit)),
                                 IconButton(

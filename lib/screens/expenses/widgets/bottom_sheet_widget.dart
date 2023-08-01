@@ -120,7 +120,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                               type: type,
                               category: selectedCategory,
                             );
-
+                            if (widget.trans != null) {
+                              newTransaction.uniqueId = widget.trans!.uniqueId;
+                            }
                             widget.onClicked(newTransaction);
                           }
 

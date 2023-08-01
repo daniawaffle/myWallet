@@ -25,14 +25,16 @@ class Transactions {
   @HiveField(3)
   String category;
   @HiveField(4)
-  late String uniqueId;
+  String? uniqueId;
 
   Transactions({
     required this.desc,
     required this.price,
     required this.type,
     required this.category,
+    this.uniqueId,
   }) {
-    uniqueId = const Uuid().v4();
+    uniqueId ??= const Uuid().v4();
+    print(uniqueId);
   }
 }
