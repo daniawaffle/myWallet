@@ -1,7 +1,7 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../models/categories.dart';
 
@@ -10,10 +10,10 @@ class BottomSheetWidget extends StatefulWidget {
   final Function(Transactions) onClicked;
 
   const BottomSheetWidget({
-    super.key,
-    required this.onClicked,
+    Key? key,
     this.trans,
-  });
+    required this.onClicked,
+  }) : super(key: key);
 
   @override
   State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
@@ -121,9 +121,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                               category: selectedCategory,
                             );
 
-                            final transactionsBox =
-                                Hive.box<Transactions>('wallet_data');
-                            transactionsBox.add(newTransaction);
+                            widget.onClicked(newTransaction);
                           }
 
                           Navigator.pop(context);
