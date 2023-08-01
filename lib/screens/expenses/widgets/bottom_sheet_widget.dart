@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../models/categories.dart';
 
@@ -113,16 +114,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                           if (!formKey.currentState!.validate()) {
                             return;
                           } else {
-                            widget.onClicked(
-                              Transactions(
-                                  desc: descController.text,
-                                  price: double.parse(priceController.text),
-                                  type: type,
-                                  category: selectedCategory),
+                            final newTransaction = Transactions(
+                              desc: descController.text,
+                              price: double.parse(priceController.text),
+                              type: type,
+                              category: selectedCategory,
                             );
 
-                            setState(() {});
-                            Navigator.pop(context);
+                            final transactionsBox =
+                                Hive.box<Transactions>('wallet_data');
+                            transactionsBox.add(newTransaction);
                           }
                         }),
                   ],
