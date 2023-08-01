@@ -4,6 +4,7 @@ import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
 
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -16,9 +17,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   ExpensesBloc bloc = ExpensesBloc();
 
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
+    final transactionsBox = Hive.box<Transactions>('wallet_data');
+    final List<Transactions> myExpenses = transactionsBox.values.toList();
     Map<String, double> dataMap = {};
 
-    for (Transactions transaction in transactions) {
+    for (Transactions transaction in myExpenses) {
       String category = transaction.category;
       dataMap[category] = (dataMap[category] ?? 0) + 1;
     }
@@ -42,9 +45,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             actions: [
               TextButton(
                   onPressed: () {
-                    for (int i = 0; i < bloc.myExpenses.length; i++) {
-                      if (bloc.myExpenses[i] == bloc.filteredList[index]) {
-                        bloc.myExpenses.removeAt(i);
+                    final transactionsBox =
+                        Hive.box<Transactions>('wallet_data');
+                    final List<Transactions> myExpenses =
+                        transactionsBox.values.toList();
+
+                    for (int i = 0; i < myExpenses.length; i++) {
+                      if (myExpenses[i] == bloc.filteredList[index]) {
+                        transactionsBox
+                            .deleteAt(i); // Delete the item from Hive box
+                        // Exit the loop once the item is deleted
                       }
                     }
 
@@ -207,21 +217,29 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                 IconButton(
                                     iconSize: 15,
                                     onPressed: () {
+                                      final transactionsBox =
+                                          Hive.box<Transactions>('wallet_data');
+                                      final List<Transactions> myExpenses =
+                                          transactionsBox.values.toList();
                                       _showBottomSheet(
                                           ctx: context,
                                           trans: bloc.filteredList[index],
                                           onClicked: (value) {
+                                            Item itemToUpdate =
+                                                itemsBox.values.firstWhere(
+                                              (item) => item.name == itemName,
+                                              orElse: () => null,
+                                            );
                                             for (int i = 0;
-                                                i < bloc.myExpenses.length;
+                                                i < myExpenses.length;
                                                 i++) {
-                                              if (bloc.myExpenses[i] ==
+                                              if (myExpenses[i] ==
                                                   bloc.filteredList[index]) {
-                                                bloc.myExpenses[i] = value;
+                                                myExpenses[i] = value;
+                                                transactionsBox.putAt(i, value);
                                               }
                                             }
-
                                             bloc.fillFilterdList();
-
                                             setState(() {});
                                           });
                                     },
