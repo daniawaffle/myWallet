@@ -14,6 +14,7 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   ExpensesBloc bloc = ExpensesBloc();
+  Map<String, int> dataMap = {};
 
   Future _deleteAlert(int index) async {
     return showDialog(
@@ -104,6 +105,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Wallet(
             income: bloc.calculateIncomeOutcome(TransactionType.income),
             outcome: bloc.calculateIncomeOutcome(TransactionType.outcome),
+            // chartExpensesDataMap:
           ),
           SizedBox(
             height: 50,

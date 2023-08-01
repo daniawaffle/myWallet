@@ -4,13 +4,14 @@ import 'package:pie_chart/pie_chart.dart';
 class Wallet extends StatelessWidget {
   final double income;
   final double outcome;
-  final Map<String, int> chartExpensesDataMap;
+  // final Map<String, int> chartExpensesDataMap;
 
-  const Wallet(
-      {super.key,
-      required this.income,
-      required this.outcome,
-      required this.chartExpensesDataMap});
+  const Wallet({
+    super.key,
+    required this.income,
+    required this.outcome,
+    // required this.chartExpensesDataMap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class Wallet extends StatelessWidget {
               children: [
                 Text(
                   textAlign: TextAlign.center,
-                  'I have ${income - outcome}JD',
+                  'Account balance ${income - outcome}JD',
                   style: const TextStyle(
                       fontSize: 15, fontWeight: FontWeight.bold),
                 ),
