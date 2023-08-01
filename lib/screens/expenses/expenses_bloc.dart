@@ -1,31 +1,13 @@
 import 'package:expenses_app/models/transactions.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/categories.dart';
 
+final transactionsBox = Hive.box<Transactions>('wallet_data');
+
 class ExpensesBloc {
-  List<Transactions> myExpenses = [
-    Transactions(
-        desc: 'desc',
-        price: 15,
-        type: TransactionType.income,
-        category: 'Food'),
-    Transactions(
-        desc: 'desc',
-        price: 50,
-        type: TransactionType.income,
-        category: 'Bills'),
-    Transactions(
-        desc: 'desc',
-        price: 30,
-        type: TransactionType.outcome,
-        category: 'Medical'),
-    Transactions(
-        desc: 'desc',
-        price: 15,
-        type: TransactionType.income,
-        category: 'Food'),
-  ];
+  final List<Transactions> myExpenses = transactionsBox.values.toList();
 
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;

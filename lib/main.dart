@@ -1,7 +1,18 @@
 import 'package:expenses_app/screens/expenses/expenses_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+import 'models/transactions.dart';
+
+late Box box;
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(TransactionsAdapter());
+  await Hive.openBox<Transactions>('wallet_data');
+
   runApp(const MainApp());
 }
 
