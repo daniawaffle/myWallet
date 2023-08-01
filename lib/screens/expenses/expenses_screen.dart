@@ -14,7 +14,17 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen> {
   ExpensesBloc bloc = ExpensesBloc();
-  Map<String, int> dataMap = {};
+
+  Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
+    Map<String, double> dataMap = {};
+
+    for (Transactions transaction in transactions) {
+      String category = transaction.category;
+      dataMap[category] = (dataMap[category] ?? 0) + 1;
+    }
+
+    return dataMap;
+  }
 
   Future _deleteAlert(int index) async {
     return showDialog(
@@ -105,7 +115,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           Wallet(
             income: bloc.calculateIncomeOutcome(TransactionType.income),
             outcome: bloc.calculateIncomeOutcome(TransactionType.outcome),
-            // chartExpensesDataMap:
+            pieMap: getCategoryOccurrences(bloc.myExpenses),
           ),
           SizedBox(
             height: 50,
