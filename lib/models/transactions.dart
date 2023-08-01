@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 part 'transactions.g.dart';
 
@@ -23,11 +24,15 @@ class Transactions {
 
   @HiveField(3)
   String category;
+  @HiveField(4)
+  late String uniqueId;
 
   Transactions({
     required this.desc,
     required this.price,
     required this.type,
     required this.category,
-  });
+  }) {
+    uniqueId = const Uuid().v4();
+  }
 }

@@ -4,22 +4,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/categories.dart';
 
-final transactionsBox = Hive.box<Transactions>('wallet_data');
-
 class ExpensesBloc {
-  final List<Transactions> myExpenses = transactionsBox.values.toList();
+  var x = 5;
 
-  // double calculateIncomeOutcome(TransactionType type) {
-  //   double totalMoney = 0;
+  final transactionsBox = Hive.box<Transactions>('wallet_data');
 
-  //   for (var expense in myExpenses) {
-  //     if (expense.type == type) {
-  //       totalMoney += expense.price;
-  //     }
-  //   }
-
-  //   return totalMoney;
-  // }
+  List<Transactions> myExpenses = [];
 
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
@@ -77,7 +67,6 @@ class ExpensesBloc {
 
   fillFilterdList() {
     filteredList = [];
-    final transactionsBox = Hive.box<Transactions>('wallet_data');
     final List<Transactions> myExpenses = transactionsBox.values.toList();
 
     if (selectedCategory == "All") {

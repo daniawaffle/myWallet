@@ -16,9 +16,19 @@ class ExpensesScreen extends StatefulWidget {
 class _ExpensesScreenState extends State<ExpensesScreen> {
   ExpensesBloc bloc = ExpensesBloc();
 
+  @override
+  void initState() {
+    bloc.myExpenses = bloc.transactionsBox.values.toList();
+
+    bloc.fillFilterdList();
+
+    setState(() {});
+
+    super.initState();
+  }
+
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
-    final transactionsBox = Hive.box<Transactions>('wallet_data');
-    final List<Transactions> myExpenses = transactionsBox.values.toList();
+    final List<Transactions> myExpenses = bloc.transactionsBox.values.toList();
     Map<String, double> dataMap = {};
 
     for (Transactions transaction in myExpenses) {
@@ -109,7 +119,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ctx: context,
               trans: null,
               onClicked: (value) {
-                bloc.myExpenses.add(value);
+                bloc.transactionsBox.add(value);
+
                 bloc.fillFilterdList();
                 setState(() {});
               });
@@ -217,31 +228,39 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                 IconButton(
                                     iconSize: 15,
                                     onPressed: () {
-                                      final transactionsBox =
-                                          Hive.box<Transactions>('wallet_data');
-                                      final List<Transactions> myExpenses =
-                                          transactionsBox.values.toList();
+                                      // final transactionsBox =
+                                      //     Hive.box<Transactions>('wallet_data');
+
+                                      // final List<Transactions> myExpenses =
+                                      //     transactionsBox.values.toList();
+
                                       _showBottomSheet(
-                                          ctx: context,
-                                          trans: bloc.filteredList[index],
-                                          onClicked: (value) {
-                                            Item itemToUpdate =
-                                                itemsBox.values.firstWhere(
-                                              (item) => item.name == itemName,
-                                              orElse: () => null,
-                                            );
-                                            for (int i = 0;
-                                                i < myExpenses.length;
-                                                i++) {
-                                              if (myExpenses[i] ==
-                                                  bloc.filteredList[index]) {
-                                                myExpenses[i] = value;
-                                                transactionsBox.putAt(i, value);
-                                              }
-                                            }
-                                            bloc.fillFilterdList();
-                                            setState(() {});
-                                          });
+                                        ctx: context,
+                                        trans: bloc.filteredList[index],
+                                        onClicked: (value) {
+                                          print(bloc
+                                              .filteredList[index].uniqueId);
+
+                                          bloc.transactionsBox.put(
+                                              bloc.filteredList[index].uniqueId,
+                                              value);
+
+                                          //  )
+                                          // for (int i = 0;
+                                          //     i < myExpenses.length;
+                                          //     i++) {
+                                          //   if (myExpenses[i].uniqueId ==
+                                          //       bloc.filteredList[index]
+                                          //           .uniqueId) {
+                                          //     transactionsBox.put(
+                                          //         myExpenses[i].uniqueId,
+                                          //         value);
+                                          //   }
+                                          // }
+                                          bloc.fillFilterdList();
+                                          setState(() {});
+                                        },
+                                      );
                                     },
                                     icon: const Icon(Icons.edit)),
                                 IconButton(
