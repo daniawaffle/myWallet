@@ -4,7 +4,28 @@ import 'package:flutter/material.dart';
 import '../../models/categories.dart';
 
 class ExpensesBloc {
-  List<Transactions> myExpenses = [];
+  List<Transactions> myExpenses = [
+    Transactions(
+        desc: 'desc',
+        price: 15,
+        type: TransactionType.income,
+        category: 'Food'),
+    Transactions(
+        desc: 'desc',
+        price: 50,
+        type: TransactionType.income,
+        category: 'Bills'),
+    Transactions(
+        desc: 'desc',
+        price: 30,
+        type: TransactionType.outcome,
+        category: 'Medical'),
+    Transactions(
+        desc: 'desc',
+        price: 15,
+        type: TransactionType.income,
+        category: 'Food'),
+  ];
 
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
