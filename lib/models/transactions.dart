@@ -12,7 +12,7 @@ enum TransactionType {
 }
 
 @HiveType(typeId: 2)
-class Transactions {
+class Transactions extends HiveObject {
   @HiveField(0)
   double price;
 

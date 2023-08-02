@@ -1,4 +1,4 @@
-import 'package:expenses_app/screens/expenses/expenses_screen.dart';
+import '/screens/expenses/expenses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

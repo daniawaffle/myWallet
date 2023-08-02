@@ -122,6 +122,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                             );
 
                             widget.onClicked(newTransaction);
+                            print(
+                                '${newTransaction.uniqueId}===== newtransaction');
                           }
 
                           Navigator.pop(context);

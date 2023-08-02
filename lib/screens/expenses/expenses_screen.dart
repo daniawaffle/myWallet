@@ -4,7 +4,6 @@ import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
 
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -55,19 +54,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             actions: [
               TextButton(
                   onPressed: () {
-                    final transactionsBox =
-                        Hive.box<Transactions>('wallet_data');
-                    final List<Transactions> myExpenses =
-                        transactionsBox.values.toList();
+                    bloc.myExpenses = bloc.transactionsBox.values.toList();
 
-                    for (int i = 0; i < myExpenses.length; i++) {
-                      if (myExpenses[i] == bloc.filteredList[index]) {
-                        transactionsBox
-                            .deleteAt(i); // Delete the item from Hive box
-                        // Exit the loop once the item is deleted
+                    for (int i = 0; i < bloc.myExpenses.length; i++) {
+                      if (bloc.myExpenses[i].uniqueId ==
+                          bloc.filteredList[index].uniqueId) {
+                        bloc.transactionsBox
+                            .delete(bloc.myExpenses[i].uniqueId);
+                        bloc.myExpenses[i].delete();
                       }
                     }
-
+                    bloc.myExpenses = bloc.transactionsBox.values.toList();
                     bloc.fillFilterdList();
                     Navigator.pop(context);
                     setState(() {});
@@ -90,7 +87,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   _showBottomSheet(
       {required BuildContext ctx,
       final Transactions? trans,
-      required Function(Transactions) onClicked}) {
+      required Function(Transactions) onClicked,
+      bool? isEdit}) {
     showModalBottomSheet(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
@@ -109,6 +107,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bloc.myExpenses = bloc.transactionsBox.values.toList();
+
+    bloc.fillFilterdList();
+    setState(() {});
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 213, 235, 233),
@@ -118,8 +120,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           _showBottomSheet(
               ctx: context,
               trans: null,
+              isEdit: false,
               onClicked: (value) {
-                bloc.transactionsBox.add(value);
+                // bloc.transactionsBox
+                //     .put(newTransaction.uniqueId, newTransaction);
+
+                bloc.transactionsBox.put(value.uniqueId, value);
+                bloc.myExpenses = bloc.transactionsBox.values.toList();
 
                 bloc.fillFilterdList();
                 setState(() {});
@@ -236,27 +243,30 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                                       _showBottomSheet(
                                         ctx: context,
-                                        trans: bloc.filteredList[index],
+                                        trans: bloc.myExpenses[index],
+                                        isEdit: true,
                                         onClicked: (value) {
-                                          print(bloc
-                                              .filteredList[index].uniqueId);
+                                          bloc.myExpenses = bloc
+                                              .transactionsBox.values
+                                              .toList();
+                                          for (int i = 0;
+                                              i < bloc.myExpenses.length;
+                                              i++) {
+                                            if (bloc.myExpenses[i].uniqueId ==
+                                                bloc.filteredList[index]
+                                                    .uniqueId) {
+                                              bloc.myExpenses[i].delete();
+                                              bloc.transactionsBox.put(
+                                                  bloc.myExpenses[i].uniqueId,
+                                                  value);
 
-                                          bloc.transactionsBox.put(
-                                              bloc.filteredList[index].uniqueId,
-                                              value);
+                                              value.save();
+                                            }
+                                          }
+                                          bloc.myExpenses = bloc
+                                              .transactionsBox.values
+                                              .toList();
 
-                                          //  )
-                                          // for (int i = 0;
-                                          //     i < myExpenses.length;
-                                          //     i++) {
-                                          //   if (myExpenses[i].uniqueId ==
-                                          //       bloc.filteredList[index]
-                                          //           .uniqueId) {
-                                          //     transactionsBox.put(
-                                          //         myExpenses[i].uniqueId,
-                                          //         value);
-                                          //   }
-                                          // }
                                           bloc.fillFilterdList();
                                           setState(() {});
                                         },
