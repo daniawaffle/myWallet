@@ -5,8 +5,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../../models/categories.dart';
 
 class ExpensesBloc {
-  var x = 5;
-
   final transactionsBox = Hive.box<Transactions>('wallet_data');
 
   List<Transactions> myExpenses = [];
@@ -67,7 +65,7 @@ class ExpensesBloc {
 
   fillFilterdList() {
     filteredList = [];
-    final List<Transactions> myExpenses = transactionsBox.values.toList();
+    myExpenses = transactionsBox.values.toList();
 
     if (selectedCategory == "All") {
       filteredList = myExpenses;
