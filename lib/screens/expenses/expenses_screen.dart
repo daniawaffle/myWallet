@@ -240,25 +240,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                                       // final List<Transactions> myExpenses =
                                       //     transactionsBox.values.toList();
+                                      print(bloc.filteredList[index].uniqueId);
 
                                       _showBottomSheet(
                                         ctx: context,
                                         trans: bloc.myExpenses[index],
                                         isEdit: true,
                                         onClicked: (value) {
-                                          bloc.myExpenses = bloc
-                                              .transactionsBox.values
-                                              .toList();
-                                          for (int i = 0;
-                                              i < bloc.myExpenses.length;
-                                              i++) {
-                                            if (bloc.myExpenses[i].uniqueId ==
-                                                bloc.filteredList[index]
-                                                    .uniqueId) {
-                                              bloc.myExpenses[i].delete();
-                                              bloc.transactionsBox.put(
-                                                  bloc.myExpenses[i].uniqueId,
-                                                  value);
+
 
                                               value.save();
                                             }
@@ -267,10 +256,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                               .transactionsBox.values
                                               .toList();
 
+
                                           bloc.fillFilterdList();
                                           setState(() {});
                                         },
                                       );
+                                      print(bloc.filteredList[index].uniqueId);
                                     },
                                     icon: const Icon(Icons.edit)),
                                 IconButton(
