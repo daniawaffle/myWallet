@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expenses_app/models/transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -6,6 +8,11 @@ import '../../models/categories.dart';
 
 class ExpensesBloc {
   final transactionsBox = Hive.box<Transactions>('wallet_data');
+  StreamController<List<Transactions>> _expensesStreamController =
+      StreamController<List<Transactions>>();
+
+  Stream<List<Transactions>> get expensesStream =>
+      _expensesStreamController.stream;
 
   List<Transactions> myExpenses = [];
 
@@ -74,5 +81,6 @@ class ExpensesBloc {
           .where((element) => element.category.contains(selectedCategory))
           .toList();
     }
+    _expensesStreamController.sink.add(filteredList);
   }
 }
