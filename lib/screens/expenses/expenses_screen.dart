@@ -231,21 +231,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                 IconButton(
                                     iconSize: 15,
                                     onPressed: () {
-<<<<<<< eliana
-=======
-                                      // final transactionsBox =
-                                      //     Hive.box<Transactions>('wallet_data');
-
-                                      // final List<Transactions> myExpenses =
-                                      //     transactionsBox.values.toList();
-                                      print(bloc.filteredList[index].uniqueId);
-
->>>>>>> main
                                       _showBottomSheet(
                                         ctx: context,
                                         trans: bloc.myExpenses[index],
                                         onClicked: (value) {
-<<<<<<< eliana
                                           for (int i = 0;
                                               i < bloc.myExpenses.length;
                                               i++) {
@@ -256,20 +245,15 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                               bloc.transactionsBox.put(
                                                   bloc.myExpenses[i].uniqueId,
                                                   value);
-=======
-
->>>>>>> main
 
                                               value.save();
                                             }
                                           }
 
-
                                           bloc.fillFilterdList();
                                           setState(() {});
                                         },
                                       );
-                                      print(bloc.filteredList[index].uniqueId);
                                     },
                                     icon: const Icon(Icons.edit)),
                                 IconButton(
