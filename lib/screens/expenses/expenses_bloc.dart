@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/categories.dart';
+import '../../models/theme_mode_option_model.dart';
 
 class ExpensesBloc {
   final transactionsBox = Hive.box<Transactions>('wallet_data');
@@ -69,6 +70,12 @@ class ExpensesBloc {
   ];
 
   List<Transactions> filteredList = [];
+
+  List<ThemeModeOptionModel> themeModeOptionList = [
+    ThemeModeOptionModel(colorName: "Red", colorValue: "0xFFFF0000"),
+    ThemeModeOptionModel(colorName: "Blue", colorValue: "0xFF0000FF"),
+    ThemeModeOptionModel(colorName: "Green", colorValue: "0xFF008000"),
+  ];
 
   fillFilterdList() {
     filteredList = [];

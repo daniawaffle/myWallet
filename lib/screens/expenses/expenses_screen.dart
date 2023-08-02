@@ -3,6 +3,7 @@ import 'package:expenses_app/mixins/widget_mixins.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
 import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
+import '../settings/settings_screen.dart';
 
 class ExpensesScreen extends StatefulWidget with WidgetsMixin {
   const ExpensesScreen({super.key});
@@ -60,6 +61,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
       appBar: AppBar(
         title: const Text('Wallet'),
         backgroundColor: Colors.teal,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => SettingsScreen(
+                        themeModeOptionList: bloc.themeModeOptionList,
+                      )));
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<List<Transactions>>(
           stream: bloc.expensesStream,
