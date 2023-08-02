@@ -84,11 +84,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         });
   }
 
-  _showBottomSheet(
-      {required BuildContext ctx,
-      final Transactions? trans,
-      required Function(Transactions) onClicked,
-      bool? isEdit}) {
+  _showBottomSheet({
+    required BuildContext ctx,
+    final Transactions? trans,
+    required Function(Transactions) onClicked,
+  }) {
     showModalBottomSheet(
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
@@ -120,11 +120,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           _showBottomSheet(
               ctx: context,
               trans: null,
-              isEdit: false,
               onClicked: (value) {
-                // bloc.transactionsBox
-                //     .put(newTransaction.uniqueId, newTransaction);
-
                 bloc.transactionsBox.put(value.uniqueId, value);
                 bloc.myExpenses = bloc.transactionsBox.values.toList();
 
@@ -235,20 +231,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                 IconButton(
                                     iconSize: 15,
                                     onPressed: () {
-                                      // final transactionsBox =
-                                      //     Hive.box<Transactions>('wallet_data');
-
-                                      // final List<Transactions> myExpenses =
-                                      //     transactionsBox.values.toList();
-
                                       _showBottomSheet(
                                         ctx: context,
                                         trans: bloc.myExpenses[index],
-                                        isEdit: true,
                                         onClicked: (value) {
-                                          bloc.myExpenses = bloc
-                                              .transactionsBox.values
-                                              .toList();
                                           for (int i = 0;
                                               i < bloc.myExpenses.length;
                                               i++) {
@@ -263,9 +249,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                               value.save();
                                             }
                                           }
-                                          bloc.myExpenses = bloc
-                                              .transactionsBox.values
-                                              .toList();
 
                                           bloc.fillFilterdList();
                                           setState(() {});
