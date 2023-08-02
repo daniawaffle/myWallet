@@ -1,18 +1,18 @@
-import 'package:expenses_app/screens/expenses/widgets/bottom_sheet_widget.dart';
+import 'package:expenses_app/mixins/delete_mixin.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
 import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
 
 import 'package:flutter/material.dart';
 
-class ExpensesScreen extends StatefulWidget {
+class ExpensesScreen extends StatefulWidget with WidgetsMixin {
   const ExpensesScreen({super.key});
 
   @override
   State<ExpensesScreen> createState() => _ExpensesScreenState();
 }
 
-class _ExpensesScreenState extends State<ExpensesScreen> {
+class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
   ExpensesBloc bloc = ExpensesBloc();
 
   @override
@@ -38,73 +38,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     return dataMap;
   }
 
-  Future _deleteAlert(int index) async {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Delete'),
-            content: const SingleChildScrollView(
-              child: Column(
-                children: [
-                  Text('Are you sure you want to delete this item?'),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    bloc.myExpenses = bloc.transactionsBox.values.toList();
-
-                    for (int i = 0; i < bloc.myExpenses.length; i++) {
-                      if (bloc.myExpenses[i].uniqueId ==
-                          bloc.filteredList[index].uniqueId) {
-                        bloc.transactionsBox
-                            .delete(bloc.myExpenses[i].uniqueId);
-                        bloc.myExpenses[i].delete();
-                      }
-                    }
-                    bloc.myExpenses = bloc.transactionsBox.values.toList();
-                    bloc.fillFilterdList();
-                    Navigator.pop(context);
-                    setState(() {});
-                  },
-                  child: const Text(
-                    'Confirm',
-                    style: TextStyle(color: Colors.teal),
-                  )),
-              TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Cancel',
-                      style: TextStyle(color: Colors.teal)))
-            ],
-          );
-        });
-  }
-
-  _showBottomSheet({
-    required BuildContext ctx,
-    final Transactions? trans,
-    required Function(Transactions) onClicked,
-  }) {
-    showModalBottomSheet(
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-        isScrollControlled: true,
-        elevation: 10,
-        backgroundColor: Colors.white,
-        context: context,
-        builder: (ctx) {
-          return BottomSheetWidget(
-              trans: trans,
-              onClicked: (value) {
-                onClicked(value);
-              });
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     bloc.myExpenses = bloc.transactionsBox.values.toList();
@@ -117,7 +50,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       floatingActionButton: IconButton(
         icon: const Icon(Icons.add),
         onPressed: () {
-          _showBottomSheet(
+          showBottomSheetMethod(
               ctx: context,
               trans: null,
               onClicked: (value) {
@@ -231,7 +164,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                 IconButton(
                                     iconSize: 15,
                                     onPressed: () {
-                                      _showBottomSheet(
+                                      showBottomSheetMethod(
                                         ctx: context,
                                         trans: bloc.myExpenses[index],
                                         onClicked: (value) {
@@ -258,8 +191,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                     icon: const Icon(Icons.edit)),
                                 IconButton(
                                     iconSize: 15,
-                                    onPressed: () {
-                                      _deleteAlert(index);
+                                    onPressed: () async {
+                                      await deleteAlert(index, context, bloc);
+                                      setState(() {});
                                     },
                                     icon: const Icon(Icons.delete))
                               ],

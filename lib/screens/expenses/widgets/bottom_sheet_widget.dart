@@ -114,7 +114,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                           if (!formKey.currentState!.validate()) {
                             return;
                           } else {
-                            final newTransaction = Transactions(
+                            Transactions newTransaction = Transactions(
                               desc: descController.text,
                               price: double.parse(priceController.text),
                               type: type,
