@@ -28,8 +28,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
 
     bloc.fillFilterdList();
     setState(() {});
-    settingsBox.get('settingsKey') ??
-        Settings(categories: ['All'], language: 'English', theme: 'Red');
+    settingsBox = locator<Box<Settings>>();
+    Settings? settings = settingsBox.get('settingsKey');
+    if (settings == null) {
+      settings =
+          Settings(categories: ['All'], language: 'English', theme: 'Red');
+
+      settingsBox.put('settingsKey', settings);
+    }
 
     super.initState();
   }

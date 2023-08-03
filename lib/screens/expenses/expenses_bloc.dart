@@ -12,7 +12,7 @@ class ExpensesBloc {
   Stream<List<Transactions>> get filteredListStream =>
       _filteredListController.stream;
 
-  final transactionsBox = Hive.box<Transactions>('wallet_data');
+  var transactionsBox = Hive.box<Transactions>('wallet_data');
 
   List<Transactions> myExpenses = [];
   var settingsBox = locator<Box<Settings>>();

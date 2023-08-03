@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
@@ -22,13 +21,6 @@ class BottomSheetWidget extends StatefulWidget {
 }
 
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
-  fillCategoryList() {
-    final Settings settings = settingsBox.get('settingsKey') ??
-        Settings(categories: ['All'], language: 'English', theme: 'Blue');
-    List categoryList = settings.categories;
-    return categoryList;
-  }
-
   final formKey = GlobalKey<FormState>();
   TransactionType type = TransactionType.income;
   final TextEditingController priceController = TextEditingController();
@@ -36,17 +28,26 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   var settingsBox = locator<Box<Settings>>();
 
   bool isIncome = true;
-  String selectedCategory = 'Food';
+  String? selectedCategory;
+
+  List<String> fillCategoryList() {
+    final Settings settings = settingsBox.get('settingsKey') ??
+        Settings(categories: ['All'], language: 'English', theme: 'Blue');
+    List<String> categoryList = List.from(settings.categories);
+    categoryList.remove('All');
+    return categoryList;
+  }
 
   @override
   void initState() {
+    fillCategoryList();
+
     if (widget.trans != null) {
       priceController.text = widget.trans!.price.toString();
       descController.text = widget.trans!.desc;
       type = widget.trans!.type;
       isIncome = type == TransactionType.income ? true : false;
       selectedCategory = widget.trans!.category;
-      fillCategoryList();
     }
 
     super.initState();
@@ -102,7 +103,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                               desc: descController.text,
                               price: double.parse(priceController.text),
                               type: type,
-                              category: selectedCategory,
+                              category: selectedCategory ??
+                                  filteredCategoryList.first,
                             );
                             if (widget.trans != null) {
                               newTransaction.uniqueId = widget.trans!.uniqueId;
@@ -118,21 +120,25 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   ],
                 ),
                 const Divider(),
-                DropdownButton(
-                  value: filteredCategoryList
-                      .firstWhere((element) => element == selectedCategory),
-                  items: filteredCategoryList.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCategory = newValue!;
-                    });
-                  },
-                ),
+                filteredCategoryList.isNotEmpty
+                    ? DropdownButton(
+                        value: selectedCategory != null
+                            ? filteredCategoryList.firstWhere(
+                                (element) => element == selectedCategory)
+                            : filteredCategoryList.first,
+                        items: filteredCategoryList.map((category) {
+                          return DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            selectedCategory = newValue!;
+                          });
+                        },
+                      )
+                    : Text('Add categories from settings please!'),
                 TextFormField(
                   controller: priceController,
                   validator: (value) {

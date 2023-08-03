@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -6,6 +8,14 @@ import '../../models/settings.dart';
 
 class SettingsBloc {
   var settingsBox = locator<Box<Settings>>();
+  final StreamController<List<String>> categoriesStreamController =
+      StreamController<List<String>>();
+  Stream<List<String>> get categoriesStream =>
+      categoriesStreamController.stream;
+
+  final StreamController<Settings> settingsStreamController =
+      StreamController<Settings>.broadcast();
+  Stream<Settings> get settingsStream => settingsStreamController.stream;
 
   Color getThemeColor() {
     Settings settings = settingsBox.get('settingsKey') ??
@@ -18,7 +28,7 @@ class SettingsBloc {
       case 'Blue':
         return Colors.blue;
       default:
-        return Colors.red; // Fallback color, choose any default color you want
+        return Colors.red;
     }
   }
 }
