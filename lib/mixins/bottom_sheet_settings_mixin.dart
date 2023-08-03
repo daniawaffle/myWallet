@@ -62,6 +62,7 @@ mixin BottomSheetSettings {
   deleteCategory(int index) {
     final List<String> categories = getCategories();
     final categoryDelete = categories.removeAt(index);
+
     updateCategories(categories);
 
     settingsBox.put('settingsKey',
@@ -128,51 +129,56 @@ mixin BottomSheetSettings {
     showModalBottomSheet<void>(
         context: context,
         builder: (BuildContext context) {
-          return StreamBuilder<Settings>(
-              stream: settingsBloc.settingsStream,
-              builder: (context, snapshot) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      margin: EdgeInsets.all(20),
-                      height: 200,
-                      width: 400,
-                      child: ListView.builder(
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          return RadioListTile(
-                            activeColor: Colors.teal,
-                            title: Text(options[index]),
-                            value: options[index],
-                            groupValue:
-                                options.contains('English') ? language : theme,
-                            onChanged: (value) {
-                              if (options.contains('English')) {
-                                language = value!;
-                              }
-                              if (options.contains('Red')) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.all(20),
+                    height: 200,
+                    width: 400,
+                    child: ListView.builder(
+                      itemCount: options.length,
+                      itemBuilder: (context, index) {
+                        return RadioListTile(
+                          activeColor: Colors.teal,
+                          title: Text(options[index]),
+                          value: options[index],
+                          groupValue:
+                              options.contains('English') ? language : theme,
+                          onChanged: (value) {
+                            if (options.contains('English')) {
+                              setState(
+                                () {
+                                  language = value!;
+                                },
+                              );
+                            }
+                            if (options.contains('Red')) {
+                              setState(() {
                                 theme = value!;
-                              }
-
-                              updateSettings();
-                            },
-                          );
-                        },
-                      ),
+                              });
+                            }
+                          },
+                        );
+                      },
                     ),
-                    TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text('Ok')),
-                    SizedBox(
-                      height: 35,
-                    )
-                  ],
-                );
-              });
+                  ),
+                  TextButton(
+                      onPressed: () {
+                        updateSettings();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Ok')),
+                  const SizedBox(
+                    height: 35,
+                  )
+                ],
+              );
+            },
+          );
         });
   }
 }

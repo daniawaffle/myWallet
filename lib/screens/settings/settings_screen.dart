@@ -45,61 +45,67 @@ class _SettingsScreenState extends State<SettingsScreen>
   Widget build(BuildContext context) {
     _loadSettings();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: settingsBloc.getThemeColor(),
-        elevation: 10,
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const ExpensesScreen()),
-              );
-            },
-            icon: const Icon(Icons.arrow_back_ios_new)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () {
-                showSettingsBottomSheet(context, ['English', 'Arabic']);
-                setState(() {});
-              },
-              child: const Text(
-                'Change language',
-                style: TextStyle(fontSize: 25),
+    return StreamBuilder<Settings>(
+        stream: settingsBloc.settingsStream,
+        builder: (context, snapshot) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Settings'),
+              backgroundColor: settingsBloc.getThemeColor(),
+              elevation: 10,
+              leading: IconButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ExpensesScreen()),
+                    );
+                  },
+                  icon: const Icon(Icons.arrow_back_ios_new)),
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      showSettingsBottomSheet(context, ['English', 'Arabic']);
+                      setState(() {});
+                    },
+                    child: const Text(
+                      'Change language',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ),
+                  const Divider(),
+                  GestureDetector(
+                    onTap: () {
+                      showSettingsBottomSheet(
+                          context, ['Red', 'Green', 'Blue']);
+                      setState(() {});
+                    },
+                    child: const Text(
+                      'Change theme',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ),
+                  const Divider(),
+                  GestureDetector(
+                    onTap: () {
+                      showCategoriesBottomSheet(context);
+                      setState(() {});
+                    },
+                    child: const Text(
+                      'Categories',
+                      style: TextStyle(fontSize: 25),
+                    ),
+                  ),
+                  const Divider()
+                ],
               ),
             ),
-            const Divider(),
-            GestureDetector(
-              onTap: () {
-                showSettingsBottomSheet(context, ['Red', 'Green', 'Blue']);
-                setState(() {});
-              },
-              child: const Text(
-                'Change theme',
-                style: TextStyle(fontSize: 25),
-              ),
-            ),
-            const Divider(),
-            GestureDetector(
-              onTap: () {
-                showCategoriesBottomSheet(context);
-                setState(() {});
-              },
-              child: const Text(
-                'Categories',
-                style: TextStyle(fontSize: 25),
-              ),
-            ),
-            const Divider()
-          ],
-        ),
-      ),
-    );
+          );
+        });
   }
 }
