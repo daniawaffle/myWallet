@@ -107,11 +107,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 ),
                 const Divider(),
                 DropdownButtonFormField(
-                  value: categoryList.contains(selectedCategory)
+                  value: categoryList.any(
+                          (element) => element.category == selectedCategory)
                       ? categoryList.firstWhere(
                           (element) => element.category == selectedCategory)
-                      : (selectedCategory == null ? null : categoryList.first),
-                  hint: Text("Select Value"),
+                      : categoryList.isNotEmpty
+                          ? categoryList.first
+                          : null,
+                  hint: const Text("Select Value"),
                   items: categoryList.map((Categories? category) {
                     return DropdownMenuItem<Categories>(
                       value: category,

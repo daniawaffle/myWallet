@@ -6,11 +6,11 @@ import '../../models/categories.dart';
 
 class CategoriesBloc {
   final categoriesBox = Hive.box<Categories>('CategoriesHive');
-  StreamController<List<Categories>> _categoriesStreamController =
+  StreamController<List<Categories>> categoriesStreamController =
       StreamController<List<Categories>>();
 
   Stream<List<Categories>> get categoriessStream =>
-      _categoriesStreamController.stream;
+      categoriesStreamController.stream;
 
   List<Categories> myCategories = [];
   get getCategries {
@@ -33,6 +33,6 @@ class CategoriesBloc {
           .where((element) => element.category.contains(selectedCategory))
           .toList();
     }
-    _categoriesStreamController.sink.add(filteredList);
+    categoriesStreamController.sink.add(filteredList);
   }
 }

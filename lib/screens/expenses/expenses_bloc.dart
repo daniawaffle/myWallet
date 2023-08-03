@@ -11,10 +11,15 @@ class ExpensesBloc {
   final transactionsBox = Hive.box<Transactions>('wallet_data');
 
   List<Transactions> myExpenses = [];
-  StreamController<List<Categories>> _categoriesStreamController =
+
+  StreamController<List<Categories>> categoriesStreamController =
       StreamController<List<Categories>>();
   Stream<List<Categories>> get categoriesStream =>
-      _categoriesStreamController.stream;
+      categoriesStreamController.stream;
+
+  StreamController<String> colorStreamController = StreamController<String>();
+  Stream<String> get colorsStream => colorStreamController.stream;
+
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
 
@@ -31,13 +36,20 @@ class ExpensesBloc {
   }
 
   String selectedCategory = 'All';
+  String appColorTheme = "#000000";
 
   List<Categories> categoryList = [];
+
+  refreshColorStream() async {
+    var settingsBox = await Hive.openBox('SettingsHive');
+    appColorTheme = settingsBox.get('appColorTheme', defaultValue: '#000000');
+    colorStreamController.sink.add(appColorTheme);
+  }
 
   fillCategoryList() async {
     var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
     categoryList = categoriesBox.values.toList();
-    _categoriesStreamController.sink.add(categoryList);
+    categoriesStreamController.sink.add(categoryList);
   }
 
   // List<Categories> categoryList = [
@@ -78,9 +90,10 @@ class ExpensesBloc {
   List<Transactions> filteredList = [];
 
   List<ThemeModeOptionModel> themeModeOptionList = [
-    ThemeModeOptionModel(colorName: "Red", colorValue: "0xFFFF0000"),
-    ThemeModeOptionModel(colorName: "Blue", colorValue: "0xFF0000FF"),
-    ThemeModeOptionModel(colorName: "Green", colorValue: "0xFF008000"),
+    ThemeModeOptionModel(colorName: "Black", colorValue: "#000000"),
+    ThemeModeOptionModel(colorName: "Red", colorValue: "#FF0000"),
+    ThemeModeOptionModel(colorName: "Blue", colorValue: "#0000FF"),
+    ThemeModeOptionModel(colorName: "Green", colorValue: "#008000"),
   ];
 
   fillFilterdList() {

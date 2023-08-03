@@ -1,13 +1,19 @@
+import 'package:expenses_app/extentions.dart';
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class Wallet extends StatelessWidget {
   final double income;
   final double outcome;
+  final String color;
   final Map<String, double>? pieMap;
 
   const Wallet(
-      {Key? key, required this.income, required this.outcome, this.pieMap})
+      {Key? key,
+      required this.income,
+      required this.outcome,
+      this.pieMap,
+      required this.color})
       : super(key: key);
 
   @override
@@ -29,16 +35,20 @@ class Wallet extends StatelessWidget {
               children: [
                 Text(
                   'Account balance ${income - outcome}JD',
-                  style: const TextStyle(
-                      fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: color.toColor()),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       ' Income \n $income JD',
-                      style: const TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: color.toColor()),
                     ),
                     if (pieMap != null && pieMap!.isNotEmpty)
                       Expanded(
@@ -62,8 +72,10 @@ class Wallet extends StatelessWidget {
                       ),
                     Text(
                       ' Outcome \n $outcome JD',
-                      style: const TextStyle(
-                          fontSize: 10, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: color.toColor()),
                     ),
                   ],
                 )
