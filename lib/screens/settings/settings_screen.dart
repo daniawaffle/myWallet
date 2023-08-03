@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import '../../models/theme_mode_option_model.dart';
+import '../expenses/expenses_bloc.dart';
 import 'categories_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final List<ThemeModeOptionModel> themeModeOptionList;
+  final ExpensesBloc expensesBloc;
 
-  SettingsScreen({super.key, required this.themeModeOptionList});
+  const SettingsScreen(
+      {super.key,
+      required this.themeModeOptionList,
+      required this.expensesBloc});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +50,9 @@ class SettingsScreen extends StatelessWidget {
               title: const Text('Categories'),
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CategoriesScreen()));
+                    builder: (context) => CategoriesScreen(
+                          expensesBloc: expensesBloc,
+                        )));
               },
             ),
           ],

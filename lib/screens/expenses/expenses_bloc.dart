@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expenses_app/models/transactions.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
@@ -9,7 +11,10 @@ class ExpensesBloc {
   final transactionsBox = Hive.box<Transactions>('wallet_data');
 
   List<Transactions> myExpenses = [];
-
+  StreamController<List<Categories>> _categoriesStreamController =
+      StreamController<List<Categories>>();
+  Stream<List<Categories>> get categoriesStream =>
+      _categoriesStreamController.stream;
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
 
@@ -32,7 +37,9 @@ class ExpensesBloc {
   fillCategoryList() async {
     var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
     categoryList = categoriesBox.values.toList();
+    _categoriesStreamController.sink.add(categoryList);
   }
+
   // List<Categories> categoryList = [
   //   Categories(
   //     category: 'All',

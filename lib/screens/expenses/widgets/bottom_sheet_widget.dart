@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
+import 'package:hive/hive.dart';
 
 import '../../../models/categories.dart';
 
@@ -26,41 +27,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   final TextEditingController descController = TextEditingController();
 
   bool isIncome = true;
-  String selectedCategory = 'Food';
+  String? selectedCategory;
 
-  List<Categories> categoryList = [
-    Categories(
-      category: 'Food',
-      categoryIcon: Icons.fastfood,
-    ),
-    Categories(
-      category: 'Transportation',
-      categoryIcon: Icons.emoji_transportation,
-    ),
-    Categories(
-      category: 'Family',
-      categoryIcon: Icons.people,
-    ),
-    Categories(
-      category: 'Personal Care',
-      categoryIcon: Icons.self_improvement,
-    ),
-    Categories(
-      category: 'Bills',
-      categoryIcon: Icons.local_atm,
-    ),
-    Categories(
-      category: 'Medical',
-      categoryIcon: Icons.medical_services,
-    ),
-    Categories(
-      category: 'Loans',
-      categoryIcon: Icons.real_estate_agent,
-    ),
-  ];
+  List<Categories> categoryList = [];
 
   @override
   void initState() {
+    categoryList = Hive.box<Categories>("CategoriesHive").values.toList();
+
     if (widget.trans != null) {
       priceController.text = widget.trans!.price.toString();
       descController.text = widget.trans!.desc;
@@ -118,7 +92,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                               desc: descController.text,
                               price: double.parse(priceController.text),
                               type: type,
-                              category: selectedCategory,
+                              category: selectedCategory!,
                             );
                             if (widget.trans != null) {
                               newTransaction.uniqueId = widget.trans!.uniqueId;
@@ -132,21 +106,25 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   ],
                 ),
                 const Divider(),
-                DropdownButton(
-                  value: categoryList.firstWhere(
-                      (element) => element.category == selectedCategory),
+                DropdownButtonFormField(
+                  value: categoryList.contains(selectedCategory)
+                      ? categoryList.firstWhere(
+                          (element) => element.category == selectedCategory)
+                      : (selectedCategory == null ? null : categoryList.first),
+                  hint: Text("Select Value"),
                   items: categoryList.map((Categories? category) {
                     return DropdownMenuItem<Categories>(
                       value: category,
                       child: Row(
                         children: [
-                          Icon(category!.categoryIcon),
+                          // Icon(Icons.abc),
                           const SizedBox(width: 8),
-                          Text(category.category),
+                          Text(category!.category),
                         ],
                       ),
                     );
                   }).toList(),
+                  validator: (value) => value == null ? 'field required' : null,
                   onChanged: (newValue) {
                     setState(() {
                       selectedCategory = newValue!.category;

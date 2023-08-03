@@ -1,4 +1,5 @@
 import 'package:expenses_app/models/categories.dart';
+import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
 import 'package:expenses_app/screens/settings/widgets/bottom_sheet_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +7,8 @@ import 'package:expenses_app/models/transactions.dart';
 import 'categories_bloc.dart';
 
 class CategoriesScreen extends StatefulWidget {
-  const CategoriesScreen({super.key});
+  final ExpensesBloc expensesBloc;
+  const CategoriesScreen({super.key, required this.expensesBloc});
 
   @override
   State<CategoriesScreen> createState() => _CategoriesScreenState();
@@ -63,6 +65,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     }
                     bloc.myCategories = bloc.categoriesBox.values.toList();
                     bloc.fillFilterdList();
+                    widget.expensesBloc.fillCategoryList();
                     Navigator.pop(context);
                   },
                   child: const Text(
@@ -119,7 +122,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               onClicked: (value) {
                 bloc.categoriesBox.put(value.uniqueId, value);
                 bloc.myCategories = bloc.categoriesBox.values.toList();
-
+                widget.expensesBloc.fillCategoryList();
                 bloc.fillFilterdList();
               });
         },
@@ -202,7 +205,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                       value.save();
                                                     }
                                                   }
-
+                                                  widget.expensesBloc
+                                                      .fillCategoryList();
                                                   bloc.fillFilterdList();
                                                 },
                                               );
@@ -211,8 +215,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                         IconButton(
                                             iconSize: 15,
                                             onPressed: () async {
-                                              await deleteAlert(
-                                                  index, context, bloc);
+                                              (bloc.myCategories.length == 1
+                                                  ? ScaffoldMessenger.of(
+                                                          context)
+                                                      .showSnackBar(
+                                                          const SnackBar(
+                                                      content: Text(
+                                                          "at least one item should exist in the list"),
+                                                    ))
+                                                  : await deleteAlert(
+                                                      index, context, bloc));
                                             },
                                             icon: const Icon(Icons.delete))
                                       ],

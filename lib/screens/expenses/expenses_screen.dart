@@ -1,3 +1,4 @@
+import 'package:expenses_app/models/categories.dart';
 import 'package:flutter/material.dart';
 import 'package:expenses_app/mixins/widget_mixins.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
@@ -35,12 +36,22 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
     return dataMap;
   }
 
+// Future<void> _navigateAndDisplaySelection(BuildContext context) async {
+//     // Navigator.push returns a Future that completes after calling
+//     // Navigator.pop on the Selection Screen.
+//     final result = await Navigator.push(
+//       context,
+//       // Create the SelectionScreen in the next step.
+//       MaterialPageRoute(builder: (context) =>   SettingsScreen(
+//                           themeModeOptionList: bloc.themeModeOptionList,
+//                         )),
+//     );
+//   }
   @override
   Widget build(BuildContext context) {
     bloc.myExpenses = bloc.transactionsBox.values.toList();
-    bloc.fillCategoryList();
-    bloc.fillFilterdList();
-    setState(() {});
+    // bloc.fillFilterdList();
+
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: const Color.fromARGB(255, 213, 235, 233),
@@ -69,6 +80,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => SettingsScreen(
                           themeModeOptionList: bloc.themeModeOptionList,
+                          expensesBloc: bloc,
                         )));
               },
             ),
@@ -82,45 +94,54 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
               outcome: bloc.calculateIncomeOutcome(TransactionType.outcome),
               pieMap: getCategoryOccurrences(bloc.myExpenses),
             ),
-            SizedBox(
-                height: 50,
-                child: ListView.builder(
-                    itemCount: bloc.categoryList.length,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (BuildContext context, int index) {
-                      setState(() {});
-                      return ElevatedButton.icon(
-                          icon: Icon(
-                            Icons.abc,
-                            // bloc.categoryList[index].categoryIcon,
-                            color: (bloc.selectedCategory ==
-                                    bloc.categoryList[index].category
-                                ? Colors.white
-                                : Colors.teal),
-                          ),
-                          label: Text(
-                            bloc.categoryList[index].category,
-                            style: TextStyle(
-                              color: (bloc.selectedCategory ==
-                                      bloc.categoryList[index].category
-                                  ? Colors.white
-                                  : Colors.teal),
-                            ),
-                          ),
-                          style: ButtonStyle(
-                            backgroundColor: (bloc.selectedCategory ==
-                                    bloc.categoryList[index].category
-                                ? MaterialStateProperty.all(Colors.teal)
-                                : MaterialStateProperty.all(Colors.white)),
-                          ),
-                          onPressed: () {
-                            bloc.selectedCategory =
-                                bloc.categoryList[index].category;
-                            bloc.fillFilterdList();
-                            setState(() {});
-                          });
-                    })),
+            StreamBuilder<List<Categories>>(
+                stream: bloc.categoriesStream,
+                builder: (context, snapshot) {
+                  return SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                          itemCount:
+                              snapshot.data?.length ?? bloc.categoryList.length,
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (snapshot.data != null) {
+                              return ElevatedButton.icon(
+                                  icon: Icon(
+                                    Icons.abc,
+                                    // bloc.categoryList[index].categoryIcon,
+                                    color: (bloc.selectedCategory ==
+                                            bloc.categoryList[index].category
+                                        ? Colors.white
+                                        : Colors.teal),
+                                  ),
+                                  label: Text(
+                                    bloc.categoryList[index].category,
+                                    style: TextStyle(
+                                      color: (bloc.selectedCategory ==
+                                              bloc.categoryList[index].category
+                                          ? Colors.white
+                                          : Colors.teal),
+                                    ),
+                                  ),
+                                  style: ButtonStyle(
+                                    backgroundColor: (bloc.selectedCategory ==
+                                            bloc.categoryList[index].category
+                                        ? MaterialStateProperty.all(Colors.teal)
+                                        : MaterialStateProperty.all(
+                                            Colors.white)),
+                                  ),
+                                  onPressed: () {
+                                    bloc.selectedCategory =
+                                        bloc.categoryList[index].category;
+                                    bloc.fillFilterdList();
+                                    setState(() {});
+                                  });
+                            } else {
+                              return Container();
+                            }
+                          }));
+                }),
             bloc.filteredList.isEmpty
                 ? const Padding(
                     padding: EdgeInsets.all(90.0),

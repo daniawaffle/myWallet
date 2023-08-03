@@ -50,7 +50,7 @@ Future<void> main() async {
       categoriesBox.put(category.uniqueId, category);
     }
   }
-  print(categoriesBox.values.toList());
+
   runApp(const MainApp());
 }
 
