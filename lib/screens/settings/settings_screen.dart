@@ -111,7 +111,8 @@ class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
                 settingsBox.put("appColorTheme", value);
                 widget.expensesBloc.appColorTheme = value;
                 widget.expensesBloc.colorStreamController.sink.add(value);
-                Navigator.pop(context);
+                // Navigator.pop(context);
+                if (context.mounted) Navigator.of(context).pop();
                 setState(() {});
               },
             );
@@ -153,32 +154,35 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
         child: Text("Loading..."),
       );
     } else {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Select Language'),
-            DropdownButton<String>(
-              value: savedLanguageValue ?? "English",
-              onChanged: (value) async {
-                savedLanguageValue = value;
-                Box<String> settingsBox = await bloc.settingsBox;
-                settingsBox.put("appLanguage", value!);
-
-                Navigator.pop(context);
-                setState(() {});
-              },
-              items: languageList.map<DropdownMenuItem<String>>(
-                (String option) {
-                  return DropdownMenuItem<String>(
-                    value: option,
-                    child: Text(option), // Display the language as the label
-                  );
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Select Language'),
+              DropdownButton<String>(
+                value: savedLanguageValue ?? "English",
+                onChanged: (value) async {
+                  savedLanguageValue = value;
+                  Box<String> settingsBox = await bloc.settingsBox;
+                  settingsBox.put("appLanguage", value!);
+                  if (context.mounted) Navigator.of(context).pop();
+                  // Navigator.pop(context);
+                  setState(() {});
                 },
-              ).toList(),
-            ),
-          ],
+                items: languageList.map<DropdownMenuItem<String>>(
+                  (String option) {
+                    return DropdownMenuItem<String>(
+                      value: option,
+                      child: Text(option), // Display the language as the label
+                    );
+                  },
+                ).toList(),
+              ),
+            ],
+          ),
         ),
       );
     }
