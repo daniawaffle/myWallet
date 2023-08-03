@@ -1,6 +1,7 @@
 import '/screens/expenses/expenses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'models/categories.dart';
 import 'models/transactions.dart';
 
 Future<void> main() async {
@@ -10,9 +11,11 @@ Future<void> main() async {
   Hive.registerAdapter(TransactionsAdapter());
   Hive.registerAdapter<TransactionType>(TransactionTypeAdapter());
 
-  await Hive.openBox<Transactions>('wallet_data');
-  await Hive.openBox("SettingsHive");
+  Hive.registerAdapter(CategoriesAdapter());
 
+  await Hive.openBox<Transactions>('wallet_data');
+  await Hive.openBox<String>("SettingsHive");
+  await Hive.openBox<Categories>("CategoriesHive");
   runApp(const MainApp());
 }
 

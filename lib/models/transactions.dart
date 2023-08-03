@@ -35,6 +35,5 @@ class Transactions extends HiveObject {
     this.uniqueId,
   }) {
     uniqueId ??= const Uuid().v4();
-    print(uniqueId);
   }
 }

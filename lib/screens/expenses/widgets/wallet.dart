@@ -50,9 +50,9 @@ class Wallet extends StatelessWidget {
                             chartType: ChartType.disc,
                             chartRadius: 60,
                             dataMap: pieMap!,
-                            chartValuesOptions:
-                                ChartValuesOptions(showChartValues: false),
-                            legendOptions: LegendOptions(
+                            chartValuesOptions: const ChartValuesOptions(
+                                showChartValues: false),
+                            legendOptions: const LegendOptions(
                               legendTextStyle: TextStyle(fontSize: 8),
                               legendPosition: LegendPosition.bottom,
                               showLegendsInRow: true,
