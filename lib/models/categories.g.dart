@@ -18,7 +18,7 @@ class CategoriesAdapter extends TypeAdapter<Categories> {
     };
     return Categories(
       category: fields[0] as String,
-      categoryIcon: fields[1] as IconData,
+      categoryIcon: fields[1] as IconData?,
       uniqueId: fields[2] as String?,
     );
   }

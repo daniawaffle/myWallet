@@ -8,12 +8,13 @@ class Categories extends HiveObject {
   @HiveField(0)
   String category;
   @HiveField(1)
-  IconData categoryIcon;
+  IconData? categoryIcon;
   @HiveField(2)
   String? uniqueId;
+
   Categories({
     required this.category,
-    required this.categoryIcon,
+    this.categoryIcon,
     this.uniqueId,
   }) {
     uniqueId ??= const Uuid().v4();

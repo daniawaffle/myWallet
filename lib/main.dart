@@ -16,6 +16,41 @@ Future<void> main() async {
   await Hive.openBox<Transactions>('wallet_data');
   await Hive.openBox<String>("SettingsHive");
   await Hive.openBox<Categories>("CategoriesHive");
+
+  var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
+  if (categoriesBox.isEmpty) {
+    List<Categories> categoryList = [
+      // Categories(
+      //   category: 'All',
+      // ),
+      Categories(
+        category: 'Food',
+      ),
+      Categories(
+        category: 'Transportation',
+      ),
+      Categories(
+        category: 'Family',
+      ),
+      Categories(
+        category: 'Personal Care',
+      ),
+      Categories(
+        category: 'Bills',
+      ),
+      Categories(
+        category: 'Medical',
+      ),
+      Categories(
+        category: 'Loans',
+      ),
+    ];
+
+    for (var category in categoryList) {
+      categoriesBox.put(category.uniqueId, category);
+    }
+  }
+  print(categoriesBox.values.toList());
   runApp(const MainApp());
 }
 

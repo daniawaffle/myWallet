@@ -103,15 +103,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                             return;
                           } else {
                             Categories newTransaction = Categories(
-                                category: nameController.text,
-                                categoryIcon: Icons.fastfood);
+                              category: nameController.text,
+                            );
                             if (widget.category != null) {
                               newTransaction.uniqueId =
                                   widget.category!.uniqueId;
                             }
                             widget.onClicked(newTransaction);
-                            print(
-                                '${newTransaction.uniqueId}===== newtransaction');
                           }
 
                           Navigator.pop(context);

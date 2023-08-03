@@ -13,6 +13,13 @@ class CategoriesBloc {
       _categoriesStreamController.stream;
 
   List<Categories> myCategories = [];
+  get getCategries {
+    final transactionsBox = Hive.box<Categories>('CategoriesHive');
+    myCategories = transactionsBox.values.toList();
+
+    return myCategories;
+  }
+
   String selectedCategory = 'All';
   List<Categories> filteredList = [];
   fillFilterdList() {
