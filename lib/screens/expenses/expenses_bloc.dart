@@ -1,13 +1,21 @@
+import 'dart:async';
+
 import 'package:expenses_app/models/transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../models/categories.dart';
+import '../../locator.dart';
+import '../../models/settings.dart';
 
 class ExpensesBloc {
+  final _filteredListController = StreamController<List<Transactions>>();
+  Stream<List<Transactions>> get filteredListStream =>
+      _filteredListController.stream;
+
   final transactionsBox = Hive.box<Transactions>('wallet_data');
 
   List<Transactions> myExpenses = [];
+  var settingsBox = locator<Box<Settings>>();
 
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
@@ -26,42 +34,14 @@ class ExpensesBloc {
 
   String selectedCategory = 'All';
 
-  List<Categories> categoryList = [
-    Categories(
-      category: 'All',
-      categoryIcon: Icons.view_module,
-    ),
-    Categories(
-      category: 'Food',
-      categoryIcon: Icons.fastfood,
-    ),
-    Categories(
-      category: 'Transportation',
-      categoryIcon: Icons.emoji_transportation,
-    ),
-    Categories(
-      category: 'Family',
-      categoryIcon: Icons.people,
-    ),
-    Categories(
-      category: 'Personal Care',
-      categoryIcon: Icons.self_improvement,
-    ),
-    Categories(
-      category: 'Bills',
-      categoryIcon: Icons.local_atm,
-    ),
-    Categories(
-      category: 'Medical',
-      categoryIcon: Icons.medical_services,
-    ),
-    Categories(
-      category: 'Loans',
-      categoryIcon: Icons.real_estate_agent,
-    ),
-  ];
-
   List<Transactions> filteredList = [];
+
+  fillCategoryList() {
+    final Settings settings = settingsBox.get('settingsKey') ??
+        Settings(categories: ['All'], language: 'English', theme: 'Blue');
+    List categoryList = settings.categories;
+    return categoryList;
+  }
 
   fillFilterdList() {
     filteredList = [];
@@ -73,6 +53,22 @@ class ExpensesBloc {
       filteredList = myExpenses
           .where((element) => element.category.contains(selectedCategory))
           .toList();
+    }
+    _filteredListController.sink.add(filteredList);
+  }
+
+  Color getThemeColor() {
+    Settings settings = settingsBox.get('settingsKey') ??
+        Settings(categories: ['All'], language: 'English', theme: 'Red');
+    switch (settings.theme) {
+      case 'Red':
+        return Colors.red;
+      case 'Green':
+        return Colors.green;
+      case 'Blue':
+        return Colors.blue;
+      default:
+        return Colors.red;
     }
   }
 }

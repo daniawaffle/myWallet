@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../../models/categories.dart';
+import '../../../locator.dart';
+import '../../../models/settings.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Transactions? trans;
@@ -20,44 +22,21 @@ class BottomSheetWidget extends StatefulWidget {
 }
 
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+  fillCategoryList() {
+    final Settings settings = settingsBox.get('settingsKey') ??
+        Settings(categories: ['All'], language: 'English', theme: 'Blue');
+    List categoryList = settings.categories;
+    return categoryList;
+  }
+
   final formKey = GlobalKey<FormState>();
   TransactionType type = TransactionType.income;
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descController = TextEditingController();
+  var settingsBox = locator<Box<Settings>>();
 
   bool isIncome = true;
   String selectedCategory = 'Food';
-
-  List<Categories> categoryList = [
-    Categories(
-      category: 'Food',
-      categoryIcon: Icons.fastfood,
-    ),
-    Categories(
-      category: 'Transportation',
-      categoryIcon: Icons.emoji_transportation,
-    ),
-    Categories(
-      category: 'Family',
-      categoryIcon: Icons.people,
-    ),
-    Categories(
-      category: 'Personal Care',
-      categoryIcon: Icons.self_improvement,
-    ),
-    Categories(
-      category: 'Bills',
-      categoryIcon: Icons.local_atm,
-    ),
-    Categories(
-      category: 'Medical',
-      categoryIcon: Icons.medical_services,
-    ),
-    Categories(
-      category: 'Loans',
-      categoryIcon: Icons.real_estate_agent,
-    ),
-  ];
 
   @override
   void initState() {
@@ -67,6 +46,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       type = widget.trans!.type;
       isIncome = type == TransactionType.income ? true : false;
       selectedCategory = widget.trans!.category;
+      fillCategoryList();
     }
 
     super.initState();
@@ -74,6 +54,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
+    List<String> categoryList = fillCategoryList();
+    List<String> filteredCategoryList = List.from(categoryList);
+    filteredCategoryList.remove('All');
+
     return Padding(
       padding: EdgeInsets.only(
           right: 20,
@@ -135,23 +119,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 ),
                 const Divider(),
                 DropdownButton(
-                  value: categoryList.firstWhere(
-                      (element) => element.category == selectedCategory),
-                  items: categoryList.map((Categories? category) {
-                    return DropdownMenuItem<Categories>(
+                  value: filteredCategoryList
+                      .firstWhere((element) => element == selectedCategory),
+                  items: filteredCategoryList.map((category) {
+                    return DropdownMenuItem(
                       value: category,
-                      child: Row(
-                        children: [
-                          Icon(category!.categoryIcon),
-                          const SizedBox(width: 8),
-                          Text(category.category),
-                        ],
-                      ),
+                      child: Text(category),
                     );
                   }).toList(),
                   onChanged: (newValue) {
                     setState(() {
-                      selectedCategory = newValue!.category;
+                      selectedCategory = newValue!;
                     });
                   },
                 ),

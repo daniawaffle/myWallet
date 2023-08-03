@@ -5,9 +5,14 @@ class Wallet extends StatelessWidget {
   final double income;
   final double outcome;
   final Map<String, double>? pieMap;
+  final theme;
 
   const Wallet(
-      {Key? key, required this.income, required this.outcome, this.pieMap})
+      {Key? key,
+      required this.income,
+      required this.outcome,
+      this.pieMap,
+      required this.theme})
       : super(key: key);
 
   @override
@@ -18,7 +23,7 @@ class Wallet extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
-            color: const Color.fromARGB(255, 123, 174, 169),
+            color: theme,
           ),
           width: MediaQuery.of(context).size.width,
           height: 200,
