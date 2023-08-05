@@ -27,7 +27,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
     bloc.myExpenses = bloc.transactionsBox.values.toList();
 
     bloc.fillFilterdList();
-    setState(() {});
+
     settingsBox = locator<Box<Settings>>();
     Settings? settings = settingsBox.get('settingsKey');
     if (settings == null) {
@@ -74,7 +74,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                 onClicked: (value) {
                   bloc.transactionsBox.put(value.uniqueId, value);
                   bloc.myExpenses = bloc.transactionsBox.values.toList();
-                  bloc.fillCategoryList();
+                  // bloc.fillCategoryList();
 
                   bloc.fillFilterdList();
                 });
@@ -89,8 +89,6 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
           actions: [
             IconButton(
                 onPressed: () {
-                  print(
-                      '${settings.theme}=== ${settings.categories}===${settings.language}');
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => SettingsScreen()),
@@ -104,9 +102,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
         ),
         body: StreamBuilder<List<Transactions>>(
             initialData: const [],
-            stream: bloc.filteredListStream,
+            stream: bloc.filteredListController.stream,
             builder: (context, snapshot) {
-              bloc.filteredList = snapshot.data ?? [];
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -148,7 +145,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                               });
                         }),
                   ),
-                  bloc.filteredList.isNotEmpty
+                  snapshot.data!.isNotEmpty
                       ? Flexible(
                           child: ListView.builder(
                               itemCount: bloc.filteredList.length,
@@ -162,16 +159,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                         color: bloc.getThemeColor()),
                                     child: Row(
                                       children: [
-                                        bloc.filteredList[index].type ==
+                                        snapshot.data![index].type ==
                                                 TransactionType.outcome
                                             ? const Icon(Icons.arrow_upward)
                                             : const Icon(Icons.arrow_downward),
-                                        bloc.filteredList[index].type ==
+                                        snapshot.data![index].type ==
                                                 TransactionType.income
                                             ? Text(
-                                                'Income ${bloc.filteredList[index].price}')
+                                                'Income ${snapshot.data![index].price}')
                                             : Text(
-                                                'Outcome ${bloc.filteredList[index].price}'),
+                                                'Outcome ${snapshot.data![index].price}'),
                                         const SizedBox(width: 25),
                                         Expanded(
                                           child: Column(
@@ -180,14 +177,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                             children: [
                                               Text(
                                                 textAlign: TextAlign.center,
-                                                bloc.filteredList[index]
-                                                    .category,
+                                                snapshot.data![index].category,
                                                 softWrap: true,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               Text(
                                                 textAlign: TextAlign.center,
-                                                bloc.filteredList[index].desc,
+                                                snapshot.data![index].desc,
                                                 softWrap: true,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
@@ -208,7 +204,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                       i++) {
                                                     if (bloc.myExpenses[i]
                                                             .uniqueId ==
-                                                        bloc.filteredList[index]
+                                                        snapshot.data![index]
                                                             .uniqueId) {
                                                       bloc.myExpenses[i]
                                                           .delete();

@@ -8,9 +8,7 @@ import '../../locator.dart';
 import '../../models/settings.dart';
 
 class ExpensesBloc {
-  final _filteredListController = StreamController<List<Transactions>>();
-  Stream<List<Transactions>> get filteredListStream =>
-      _filteredListController.stream;
+  final filteredListController = StreamController<List<Transactions>>();
 
   var transactionsBox = Hive.box<Transactions>('wallet_data');
 
@@ -54,7 +52,7 @@ class ExpensesBloc {
           .where((element) => element.category.contains(selectedCategory))
           .toList();
     }
-    _filteredListController.sink.add(filteredList);
+    filteredListController.sink.add(filteredList);
   }
 
   Color getThemeColor() {
