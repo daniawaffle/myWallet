@@ -38,7 +38,7 @@ class HiveService {
     }
   }
 
-  Future<T> getBoxValueByKey<T>(
+  Future<T?> getBoxValueByKey<T>(
       {required String boxName, required String key}) async {
     T value;
     final box = await Hive.openBox<T>(boxName);

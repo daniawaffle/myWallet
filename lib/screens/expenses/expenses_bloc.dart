@@ -49,9 +49,10 @@ class ExpensesBloc {
     // await settingsLocator.init();
     // appColorTheme = settingsLocator.readSetting('appColorTheme') ?? "#000000";
 
-    appColorTheme = await locator<HiveService>()
-            .getBoxValueByKey(boxName: settingsHive, key: appColorTheme) ??
+    appColorTheme = await locator<HiveService>().getBoxValueByKey(
+            boxName: settingsHive, key: hiveKeyAppColorTheme) ??
         "#000000";
+
     colorStreamController.sink.add(appColorTheme);
   }
 

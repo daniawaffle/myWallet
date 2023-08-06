@@ -29,9 +29,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
         .map((dynamic item) => item as Transactions)
         .toList();
     bloc.fillFilterdList();
-    bloc.refreshColorStream();
+    _initSavedLanguageValue();
     setState(() {});
     super.initState();
+  }
+
+  Future<void> _initSavedLanguageValue() async {
+    await bloc.refreshColorStream();
+    setState(() {});
   }
 
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
