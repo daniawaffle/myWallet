@@ -428,7 +428,7 @@ packages:
     source: hosted
     version: "2.1.7"
   pie_chart:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: pie_chart
       sha256: "5dba6d0eb4718e8ed00a9079361cd8947c3f84ac5a5d76f05a27f4ec5e27589e"
