@@ -1,6 +1,6 @@
 import 'package:expenses_app/screens/settings/settings_bloc.dart';
+import 'package:expenses_app/services/locaters/settings_hive_locater.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 
 import '../../models/theme_mode_option_model.dart';
 import '../expenses/expenses_bloc.dart';
@@ -86,10 +86,10 @@ class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
   }
 
   Future<void> _initSavedColorValue() async {
-    Box<String> settingsBox = await bloc.settingsBox;
-    setState(() {
-      savedColorValue = settingsBox.get('appColorTheme') ?? "#000000";
-    });
+    final settingsLocator = SettingsLocater();
+    await settingsLocator.init();
+    savedColorValue = settingsLocator.readSetting('appColorTheme') ?? "#000000";
+    setState(() {});
   }
 
   @override
@@ -106,11 +106,12 @@ class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
               groupValue: appColorTheme,
               onChanged: (value) async {
                 appColorTheme = value!;
-                Box<String> settingsBox = await bloc.settingsBox;
-
-                settingsBox.put("appColorTheme", value);
+                final settingsLocator = SettingsLocater();
+                settingsLocator.init();
+                settingsLocator.createSetting('appColorTheme', value);
                 widget.expensesBloc.appColorTheme = value;
                 widget.expensesBloc.colorStreamController.sink.add(value);
+                settingsLocator.closeBox();
                 // Navigator.pop(context);
                 if (context.mounted) Navigator.of(context).pop();
                 setState(() {});
@@ -140,11 +141,11 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
   }
 
   Future<void> _initSavedLanguageValue() async {
-    Box<String> settingsBox = await bloc.settingsBox;
-
-    setState(() {
-      savedLanguageValue = settingsBox.get('appLanguage') ?? "English";
-    });
+    final settingsLocator = SettingsLocater();
+    await settingsLocator.init();
+    savedLanguageValue =
+        settingsLocator.readSetting('appLanguage') ?? "English";
+    setState(() {});
   }
 
   @override
@@ -166,8 +167,10 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
                 value: savedLanguageValue ?? "English",
                 onChanged: (value) async {
                   savedLanguageValue = value;
-                  Box<String> settingsBox = await bloc.settingsBox;
-                  settingsBox.put("appLanguage", value!);
+                  final settingsLocator = SettingsLocater();
+                  settingsLocator.init();
+                  settingsLocator.createSetting('appLanguage', value!);
+                  settingsLocator.closeBox();
                   if (context.mounted) Navigator.of(context).pop();
                   // Navigator.pop(context);
                   setState(() {});

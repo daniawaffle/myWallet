@@ -22,6 +22,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
     bloc.fillCategoryList();
     bloc.myExpenses = bloc.transactionsBox.values.toList();
     bloc.fillFilterdList();
+    bloc.refreshColorStream();
+    setState(() {});
     super.initState();
   }
 

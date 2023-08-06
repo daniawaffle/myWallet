@@ -1,13 +1,13 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
-class HiveLocator {
-  static final HiveLocator _instance = HiveLocator._internal();
+class SettingsLocater {
+  static final SettingsLocater _instance = SettingsLocater._internal();
 
-  factory HiveLocator() {
+  factory SettingsLocater() {
     return _instance;
   }
 
-  HiveLocator._internal();
+  SettingsLocater._internal();
 
   Box<String>? _settingsBox;
 

@@ -1,18 +1,43 @@
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-// HiveProvider class to manage Hive operations
-class HiveProvider {
-  late Box<String> settingsHiveBox;
+import '../../models/transactions.dart';
 
-  Future<void> initHive() async {
-    settingsHiveBox = await Hive.openBox<String>("SettingsHive");
+class TransactionHiveLocater {
+  static final TransactionHiveLocater _instance =
+      TransactionHiveLocater._internal();
+
+  factory TransactionHiveLocater() {
+    return _instance;
   }
 
-  String? getSavedLanguageValue() {
-    return settingsHiveBox.get('appLanguage');
+  TransactionHiveLocater._internal();
+
+  Box<Transactions>? _transactionsBox;
+
+  Future<void> init() async {
+    await Hive.initFlutter();
+    Hive.registerAdapter(TransactionsAdapter());
+    _transactionsBox = await Hive.openBox<Transactions>('wallet_data');
   }
 
-  void saveLanguageValue(String value) {
-    settingsHiveBox.put("appLanguage", value);
+  Future<void> closeBox() async {
+    if (_transactionsBox != null && _transactionsBox!.isOpen) {
+      await _transactionsBox!.close();
+    }
+  }
+
+  Future<void> addTransaction(Transactions transaction) async {
+    _transactionsBox?.put(transaction.uniqueId, transaction);
+    await transaction.save();
+  }
+
+  Future<void> updateTransaction(
+      String uniqueId, Transactions updatedTransaction) async {
+    _transactionsBox?.put(uniqueId, updatedTransaction);
+    await updatedTransaction.save();
+  }
+
+  Future<void> deleteTransaction(String uniqueId) async {
+    _transactionsBox?.delete(uniqueId);
   }
 }

@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/categories.dart';
 import '../../models/theme_mode_option_model.dart';
+import '../../services/locaters/settings_hive_locater.dart';
 
 class ExpensesBloc {
   final transactionsBox = Hive.box<Transactions>('wallet_data');
@@ -41,9 +42,11 @@ class ExpensesBloc {
   List<Categories> categoryList = [];
 
   refreshColorStream() async {
-    var settingsBox = await Hive.openBox('SettingsHive');
-    appColorTheme = settingsBox.get('appColorTheme', defaultValue: '#000000');
+    final settingsLocator = SettingsLocater();
+    await settingsLocator.init();
+    appColorTheme = settingsLocator.readSetting('appColorTheme') ?? "#000000";
     colorStreamController.sink.add(appColorTheme);
+    settingsLocator.closeBox();
   }
 
   fillCategoryList() async {
