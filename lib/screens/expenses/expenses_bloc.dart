@@ -52,6 +52,9 @@ class ExpensesBloc {
     categoriesStreamController.sink.add(categoryList);
   }
 
+  void notifyUpdate() {
+    colorStreamController.sink.add("");
+  }
   // List<Categories> categoryList = [
   //   Categories(
   //     category: 'All',

@@ -4,6 +4,7 @@ import 'package:expenses_app/screens/settings/widgets/bottom_sheet_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
+import 'package:hive/hive.dart';
 import 'categories_bloc.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -52,8 +53,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             ),
             actions: [
               TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    String deletedCategory = bloc.filteredList[index].category;
                     bloc.myCategories = bloc.categoriesBox.values.toList();
+                    final transactionsBox =
+                        await Hive.openBox<Transactions>('wallet_data');
 
                     for (int i = 0; i < bloc.myCategories.length; i++) {
                       if (bloc.myCategories[i].uniqueId ==
@@ -65,8 +69,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     }
                     bloc.myCategories = bloc.categoriesBox.values.toList();
                     bloc.fillFilterdList();
+
+                    final transactionsToDelete =
+                        transactionsBox.values.where((transaction) {
+                      return transaction.category == deletedCategory;
+                    });
+
+                    for (final transaction in transactionsToDelete) {
+                      transaction.category = "";
+                      widget.expensesBloc.transactionsBox
+                          .put(transaction.uniqueId, transaction);
+
+                      transaction.save();
+                    }
+
                     widget.expensesBloc.fillCategoryList();
-                    Navigator.pop(context);
+                    widget.expensesBloc.fillFilterdList();
+                    widget.expensesBloc.notifyUpdate();
+                    if (context.mounted) Navigator.of(context).pop();
                   },
                   child: const Text(
                     'Confirm',
@@ -182,10 +202,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                         IconButton(
                                             iconSize: 15,
                                             onPressed: () {
+                                              final String editedCategory = bloc
+                                                  .myCategories[index].category;
                                               showBottomSheetMethod(
                                                 ctx: context,
                                                 cat: bloc.myCategories[index],
-                                                onClicked: (value) {
+                                                onClicked: (value) async {
+                                                  final transactionsBox =
+                                                      await Hive.openBox<
+                                                              Transactions>(
+                                                          'wallet_data');
+
                                                   for (int i = 0;
                                                       i <
                                                           bloc.myCategories
@@ -205,9 +232,36 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                       value.save();
                                                     }
                                                   }
+
+                                                  final transactionsToDelete =
+                                                      transactionsBox.values
+                                                          .where((transaction) {
+                                                    return transaction
+                                                            .category ==
+                                                        editedCategory;
+                                                  });
+
+                                                  for (final transaction
+                                                      in transactionsToDelete) {
+                                                    transaction.category =
+                                                        value.category;
+                                                    widget.expensesBloc
+                                                        .transactionsBox
+                                                        .put(
+                                                            transaction
+                                                                .uniqueId,
+                                                            transaction);
+
+                                                    transaction.save();
+                                                  }
+
                                                   widget.expensesBloc
                                                       .fillCategoryList();
                                                   bloc.fillFilterdList();
+                                                  widget.expensesBloc
+                                                      .fillFilterdList();
+                                                  widget.expensesBloc
+                                                      .notifyUpdate();
                                                 },
                                               );
                                             },
