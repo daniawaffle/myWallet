@@ -1,3 +1,4 @@
+import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/extentions.dart';
 import 'package:expenses_app/models/categories.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:expenses_app/mixins/widget_mixins.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
 import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
+import '../../locater.dart';
+import '../../services/hive_service.dart';
 import '../settings/settings_screen.dart';
 
 class ExpensesScreen extends StatefulWidget with WidgetsMixin {
@@ -20,7 +23,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
   @override
   void initState() {
     bloc.fillCategoryList();
-    bloc.myExpenses = bloc.transactionsBox.values.toList();
+    bloc.myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
     bloc.fillFilterdList();
     bloc.refreshColorStream();
     setState(() {});
@@ -28,7 +35,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
   }
 
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
-    final List<Transactions> myExpenses = bloc.transactionsBox.values.toList();
+    final List<Transactions> myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .toList() as List<Transactions>;
     Map<String, double> dataMap = {};
 
     for (Transactions transaction in myExpenses) {
@@ -41,7 +51,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
 
   @override
   Widget build(BuildContext context) {
-    bloc.myExpenses = bloc.transactionsBox.values.toList();
+    bloc.myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
     // bloc.fillFilterdList();
 
     return StreamBuilder<String>(
@@ -62,9 +76,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                         ctx: context,
                         trans: null,
                         onClicked: (value) {
-                          bloc.transactionsBox.put(value.uniqueId, value);
-                          bloc.myExpenses =
-                              bloc.transactionsBox.values.toList();
+                          // bloc.transactionsBox.put(value.uniqueId, value);
+                          locator<HiveService>().setValue(
+                              boxName: transactionsHive,
+                              key: value.uniqueId!,
+                              value: value);
+
+                          bloc.myExpenses = locator<HiveService>()
+                              .transactionBox
+                              .values
+                              .toList() as List<Transactions>;
 
                           bloc.fillFilterdList();
                           setState(() {});
@@ -104,6 +125,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           SizedBox(
                             height: 50,
@@ -289,13 +311,22 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                               .uniqueId) {
                                                         bloc.myExpenses[i]
                                                             .delete();
-                                                        bloc.transactionsBox
-                                                            .put(
-                                                                bloc
+                                                        // bloc.transactionsBox
+                                                        //     .put(
+                                                        //         bloc
+                                                        //             .myExpenses[
+                                                        //                 i]
+                                                        //             .uniqueId,
+                                                        //         value);
+                                                        locator<HiveService>()
+                                                            .setValue(
+                                                                boxName:
+                                                                    transactionsHive,
+                                                                key: bloc
                                                                     .myExpenses[
                                                                         i]
-                                                                    .uniqueId,
-                                                                value);
+                                                                    .uniqueId!,
+                                                                value: value);
 
                                                         value.save();
                                                       }

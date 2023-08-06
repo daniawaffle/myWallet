@@ -1,15 +1,14 @@
 import 'dart:async';
-
+import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/models/transactions.dart';
-
 import 'package:hive_flutter/hive_flutter.dart';
-
+import '../../locater.dart';
 import '../../models/categories.dart';
 import '../../models/theme_mode_option_model.dart';
-import '../../services/locaters/settings_hive_locater.dart';
+import '../../services/hive_service.dart';
 
 class ExpensesBloc {
-  final transactionsBox = Hive.box<Transactions>('wallet_data');
+  // final transactionsBox = Hive.box<Transactions>(TRANSACTIONS_HIVE);
 
   List<Transactions> myExpenses = [];
 
@@ -24,9 +23,13 @@ class ExpensesBloc {
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
 
-    final transactionsBox = Hive.box<Transactions>('wallet_data');
-    final List<Transactions> myExpenses = transactionsBox.values.toList();
-
+    // final transactionsBox = Hive.box<Transactions>('wallet_data');
+    // final List<Transactions> myExpenses = transactionsBox.values.toList();
+    final List<Transactions> myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
     for (var expense in myExpenses) {
       if (expense.type == type) {
         totalMoney += expense.price;
@@ -42,11 +45,14 @@ class ExpensesBloc {
   List<Categories> categoryList = [];
 
   refreshColorStream() async {
-    final settingsLocator = SettingsLocater();
-    await settingsLocator.init();
-    appColorTheme = settingsLocator.readSetting('appColorTheme') ?? "#000000";
+    // final settingsLocator = SettingsLocater();
+    // await settingsLocator.init();
+    // appColorTheme = settingsLocator.readSetting('appColorTheme') ?? "#000000";
+
+    appColorTheme = await locator<HiveService>()
+            .getBoxValueByKey(boxName: settingsHive, key: appColorTheme) ??
+        "#000000";
     colorStreamController.sink.add(appColorTheme);
-    settingsLocator.closeBox();
   }
 
   fillCategoryList() async {
@@ -104,7 +110,11 @@ class ExpensesBloc {
 
   fillFilterdList() {
     filteredList = [];
-    myExpenses = transactionsBox.values.toList();
+    myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
 
     if (selectedCategory == "All") {
       filteredList = myExpenses;

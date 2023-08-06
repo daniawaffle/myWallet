@@ -1,28 +1,28 @@
+import 'package:expenses_app/services/hive_service.dart';
+
 import '/screens/expenses/expenses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'locater.dart';
 import 'models/categories.dart';
 import 'models/transactions.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Hive.initFlutter();
   Hive.registerAdapter(TransactionsAdapter());
   Hive.registerAdapter<TransactionType>(TransactionTypeAdapter());
-
   Hive.registerAdapter(CategoriesAdapter());
+  setupLocator();
+  await locator<HiveService>().openBoxes();
 
-  await Hive.openBox<Transactions>('wallet_data');
-  await Hive.openBox<String>("SettingsHive");
-  await Hive.openBox<Categories>("CategoriesHive");
+  // await Hive.openBox<Transactions>('wallet_data');
+  // await Hive.openBox<String>("SettingsHive");
+  // await Hive.openBox<Categories>("CategoriesHive");
 
   var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
   if (categoriesBox.isEmpty) {
     List<Categories> categoryList = [
-      // Categories(
-      //   category: 'All',
-      // ),
       Categories(
         category: 'Food',
       ),
@@ -50,6 +50,7 @@ Future<void> main() async {
       categoriesBox.put(category.uniqueId, category);
     }
   }
+  await categoriesBox.close();
 
   runApp(const MainApp());
 }

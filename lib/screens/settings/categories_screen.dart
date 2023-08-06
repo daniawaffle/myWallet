@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'package:expenses_app/models/transactions.dart';
 import 'package:hive/hive.dart';
+import '../../constants.dart';
+import '../../locater.dart';
+import '../../services/hive_service.dart';
 import 'categories_bloc.dart';
 
 class CategoriesScreen extends StatefulWidget {
@@ -77,8 +80,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
                     for (final transaction in transactionsToDelete) {
                       transaction.category = "";
-                      widget.expensesBloc.transactionsBox
-                          .put(transaction.uniqueId, transaction);
+                      // widget.expensesBloc.transactionsBox
+                      //     .put(transaction.uniqueId, transaction);
+                      locator<HiveService>().setValue(
+                          boxName: transactionsHive,
+                          key: transaction.uniqueId!,
+                          value: transaction);
 
                       transaction.save();
                     }
@@ -245,12 +252,19 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                       in transactionsToDelete) {
                                                     transaction.category =
                                                         value.category;
-                                                    widget.expensesBloc
-                                                        .transactionsBox
-                                                        .put(
-                                                            transaction
-                                                                .uniqueId,
-                                                            transaction);
+                                                    // widget.expensesBloc
+                                                    //     .transactionsBox
+                                                    //     .put(
+                                                    //         transaction
+                                                    //             .uniqueId,
+                                                    //         transaction);
+                                                    locator<HiveService>()
+                                                        .setValue(
+                                                            boxName:
+                                                                transactionsHive,
+                                                            key: transaction
+                                                                .uniqueId!,
+                                                            value: transaction);
 
                                                     transaction.save();
                                                   }

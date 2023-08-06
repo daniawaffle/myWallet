@@ -1,7 +1,7 @@
-import 'package:expenses_app/screens/settings/settings_bloc.dart';
-import 'package:expenses_app/services/locaters/settings_hive_locater.dart';
+import 'package:expenses_app/constants.dart';
+import 'package:expenses_app/locater.dart';
+import 'package:expenses_app/services/hive_service.dart';
 import 'package:flutter/material.dart';
-
 import '../../models/theme_mode_option_model.dart';
 import '../expenses/expenses_bloc.dart';
 import 'categories_screen.dart';
@@ -78,7 +78,6 @@ class ThemeModeBottomSheet extends StatefulWidget {
 
 class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
   late String? savedColorValue = "#000000";
-  SettingsBloc bloc = SettingsBloc();
   @override
   void initState() {
     super.initState();
@@ -86,9 +85,11 @@ class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
   }
 
   Future<void> _initSavedColorValue() async {
-    final settingsLocator = SettingsLocater();
-    await settingsLocator.init();
-    savedColorValue = settingsLocator.readSetting('appColorTheme') ?? "#000000";
+    savedColorValue = await locator<HiveService>()
+        .getBoxValueByKey(boxName: settingsHive, key: hiveKeyAppColorTheme);
+    if (savedColorValue == null || savedColorValue!.isEmpty) {
+      savedColorValue = "#000000";
+    }
     setState(() {});
   }
 
@@ -106,13 +107,12 @@ class _ThemeModeBottomSheetState extends State<ThemeModeBottomSheet> {
               groupValue: appColorTheme,
               onChanged: (value) async {
                 appColorTheme = value!;
-                final settingsLocator = SettingsLocater();
-                settingsLocator.init();
-                settingsLocator.createSetting('appColorTheme', value);
+                await locator<HiveService>().setBoxValueByKey<String>(
+                    boxName: settingsHive,
+                    key: hiveKeyAppColorTheme,
+                    value: value);
                 widget.expensesBloc.appColorTheme = value;
                 widget.expensesBloc.colorStreamController.sink.add(value);
-                settingsLocator.closeBox();
-                // Navigator.pop(context);
                 if (context.mounted) Navigator.of(context).pop();
                 setState(() {});
               },
@@ -131,7 +131,6 @@ class LanguageBottomSheet extends StatefulWidget {
 
 class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
   late String? savedLanguageValue = "English";
-  SettingsBloc bloc = SettingsBloc();
   List<String> languageList = ["English", "Arabic"];
 
   @override
@@ -141,10 +140,11 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
   }
 
   Future<void> _initSavedLanguageValue() async {
-    final settingsLocator = SettingsLocater();
-    await settingsLocator.init();
-    savedLanguageValue =
-        settingsLocator.readSetting('appLanguage') ?? "English";
+    savedLanguageValue = await locator<HiveService>()
+        .getBoxValueByKey(boxName: settingsHive, key: hiveKeyAppLanguage);
+    if (savedLanguageValue == null || savedLanguageValue!.isEmpty) {
+      savedLanguageValue = "English";
+    }
     setState(() {});
   }
 
@@ -167,12 +167,11 @@ class _LanguageBottomSheetState extends State<LanguageBottomSheet> {
                 value: savedLanguageValue ?? "English",
                 onChanged: (value) async {
                   savedLanguageValue = value;
-                  final settingsLocator = SettingsLocater();
-                  settingsLocator.init();
-                  settingsLocator.createSetting('appLanguage', value!);
-                  settingsLocator.closeBox();
+                  await locator<HiveService>().setBoxValueByKey<String>(
+                      boxName: settingsHive,
+                      key: hiveKeyAppLanguage,
+                      value: value!);
                   if (context.mounted) Navigator.of(context).pop();
-                  // Navigator.pop(context);
                   setState(() {});
                 },
                 items: languageList.map<DropdownMenuItem<String>>(
