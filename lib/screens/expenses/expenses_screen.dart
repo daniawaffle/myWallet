@@ -99,65 +99,101 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                           bloc.calculateIncomeOutcome(TransactionType.outcome),
                       pieMap: getCategoryOccurrences(bloc.myExpenses),
                     ),
-                    StreamBuilder<List<Categories>>(
-                        stream: bloc.categoriesStream,
-                        builder: (context, snapshot) {
-                          return SizedBox(
-                              height: 50,
-                              child: ListView.builder(
-                                  itemCount: snapshot.data?.length ??
-                                      bloc.categoryList.length,
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    if (snapshot.data != null) {
-                                      return ElevatedButton(
-                                        // icon: Icon(
-                                        //   Icons.abc,
-                                        //   // bloc.categoryList[index].categoryIcon,
-                                        //   color: (bloc.selectedCategory ==
-                                        //           bloc.categoryList[index]
-                                        //               .category
-                                        //       ? Colors.white
-                                        //       : Colors.teal),
-                                        // ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: (bloc.selectedCategory == 'All'
+                                    ? MaterialStateProperty.all(Colors.teal)
+                                    : MaterialStateProperty.all(Colors.white)),
+                              ),
+                              onPressed: () {
+                                bloc.selectedCategory = "All";
+                                bloc.fillFilterdList();
+                                setState(() {});
+                              },
+                              child: Text(
+                                "All",
+                                style: TextStyle(
+                                    color: bloc.appColorTheme.toColor()),
+                                // TextStyle(
+                                //   color: (bloc.selectedCategory ==
+                                //           bloc.categoryList[index]
+                                //               .category
+                                //       ? Colors.white
+                                //       : Colors.teal),
+                                // ),
+                              ),
+                            ),
+                          ),
+                          StreamBuilder<List<Categories>>(
+                              stream: bloc.categoriesStream,
+                              builder: (context, snapshot) {
+                                return SizedBox(
+                                    height: 50,
+                                    child: ListView.builder(
+                                        itemCount: snapshot.data?.length ??
+                                            bloc.categoryList.length,
+                                        shrinkWrap: true,
+                                        scrollDirection: Axis.horizontal,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          if (snapshot.data != null) {
+                                            return ElevatedButton(
+                                              // icon: Icon(
+                                              //   Icons.abc,
+                                              //   // bloc.categoryList[index].categoryIcon,
+                                              //   color: (bloc.selectedCategory ==
+                                              //           bloc.categoryList[index]
+                                              //               .category
+                                              //       ? Colors.white
+                                              //       : Colors.teal),
+                                              // ),
 
-                                        style: ButtonStyle(
-                                          backgroundColor:
-                                              (bloc.selectedCategory ==
-                                                      bloc.categoryList[index]
-                                                          .category
-                                                  ? MaterialStateProperty.all(
-                                                      Colors.teal)
-                                                  : MaterialStateProperty.all(
-                                                      Colors.white)),
-                                        ),
-                                        onPressed: () {
-                                          bloc.selectedCategory =
-                                              bloc.categoryList[index].category;
-                                          bloc.fillFilterdList();
-                                          setState(() {});
-                                        },
-                                        child: Text(
-                                          bloc.categoryList[index].category,
-                                          style: TextStyle(
-                                              color:
-                                                  bloc.appColorTheme.toColor()),
-                                          // TextStyle(
-                                          //   color: (bloc.selectedCategory ==
-                                          //           bloc.categoryList[index]
-                                          //               .category
-                                          //       ? Colors.white
-                                          //       : Colors.teal),
-                                          // ),
-                                        ),
-                                      );
-                                    } else {
-                                      return Container();
-                                    }
-                                  }));
-                        }),
+                                              style: ButtonStyle(
+                                                backgroundColor: (bloc
+                                                            .selectedCategory ==
+                                                        bloc.categoryList[index]
+                                                            .category
+                                                    ? MaterialStateProperty.all(
+                                                        Colors.teal)
+                                                    : MaterialStateProperty.all(
+                                                        Colors.white)),
+                                              ),
+                                              onPressed: () {
+                                                bloc.selectedCategory = bloc
+                                                    .categoryList[index]
+                                                    .category;
+                                                bloc.fillFilterdList();
+                                                setState(() {});
+                                              },
+                                              child: Text(
+                                                bloc.categoryList[index]
+                                                    .category,
+                                                style: TextStyle(
+                                                    color: bloc.appColorTheme
+                                                        .toColor()),
+                                                // TextStyle(
+                                                //   color: (bloc.selectedCategory ==
+                                                //           bloc.categoryList[index]
+                                                //               .category
+                                                //       ? Colors.white
+                                                //       : Colors.teal),
+                                                // ),
+                                              ),
+                                            );
+                                          } else {
+                                            return Container();
+                                          }
+                                        }));
+                              }),
+                        ],
+                      ),
+                    ),
                     bloc.filteredList.isEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(90.0),
