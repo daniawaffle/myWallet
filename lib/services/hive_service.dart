@@ -1,3 +1,4 @@
+import 'package:expenses_app/models/categories.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../constants.dart';
@@ -6,9 +7,11 @@ import '../models/transactions.dart';
 class HiveService {
   //  Already open box
   late Box transactionBox;
+  late Box categoriesBox;
 
   Future<void> openBoxes() async {
     transactionBox = await Hive.openBox<Transactions>(transactionsHive);
+    categoriesBox = await Hive.openBox<Categories>(categoriesHive);
   }
 
   Future<void> setValue<T>(
@@ -17,6 +20,9 @@ class HiveService {
       case transactionsHive:
         await transactionBox.put(key, value);
         break;
+      case categoriesHive:
+        await categoriesBox.put(key, value);
+        break;
     }
   }
 
@@ -24,6 +30,10 @@ class HiveService {
     switch (boxName) {
       case transactionsHive:
         return transactionBox.get(key);
+
+      case categoriesHive:
+        return categoriesBox.get(key);
+
       default:
         return null;
     }
@@ -35,7 +45,27 @@ class HiveService {
       case transactionsHive:
         await transactionBox.delete(key);
         break;
+      case categoriesHive:
+        await categoriesBox.delete(key);
+        break;
     }
+  }
+
+  Future<void> deleteValueByKey<T>({
+    required String boxName,
+    required String key,
+  }) async {
+    final box = await Hive.openBox<T>(boxName);
+    await box.delete(key);
+    await box.close();
+  }
+
+  Future<List<T>> getAllValues<T>({required String boxName}) async {
+    final box = await Hive.openBox<T>(boxName);
+    final List<T> allValues = box.values.toList();
+    await box.close();
+
+    return allValues;
   }
 
   Future<T?> getBoxValueByKey<T>(

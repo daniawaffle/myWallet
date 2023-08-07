@@ -1,3 +1,4 @@
+import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/services/hive_service.dart';
 
 import '/screens/expenses/expenses_screen.dart';
@@ -20,8 +21,7 @@ Future<void> main() async {
   // await Hive.openBox<String>("SettingsHive");
   // await Hive.openBox<Categories>("CategoriesHive");
 
-  var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
-  if (categoriesBox.isEmpty) {
+  if (locator<HiveService>().categoriesBox.isEmpty) {
     List<Categories> categoryList = [
       Categories(
         category: 'Food',
@@ -47,10 +47,10 @@ Future<void> main() async {
     ];
 
     for (var category in categoryList) {
-      categoriesBox.put(category.uniqueId, category);
+      locator<HiveService>().setValue(
+          boxName: categoriesHive, key: category.uniqueId!, value: category);
     }
   }
-  await categoriesBox.close();
 
   runApp(const MainApp());
 }

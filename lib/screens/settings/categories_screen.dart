@@ -23,14 +23,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   void initState() {
-    bloc.myCategories = bloc.categoriesBox.values.toList();
+    bloc.myCategories = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
     bloc.fillFilterdList();
 
     super.initState();
   }
 
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
-    final List<Categories> myCategories = bloc.categoriesBox.values.toList();
+    final List<Categories> myCategories = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
     Map<String, double> dataMap = {};
 
     for (Categories categories in myCategories) {
@@ -58,7 +66,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               TextButton(
                   onPressed: () async {
                     String deletedCategory = bloc.filteredList[index].category;
-                    bloc.myCategories = bloc.categoriesBox.values.toList();
+                    bloc.myCategories = locator<HiveService>()
+                        .categoriesBox
+                        .values
+                        .map((dynamic item) => item as Categories)
+                        .toList();
                     final transactionsBox =
                         await Hive.openBox<Transactions>('wallet_data');
 
@@ -66,11 +78,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       if (bloc.myCategories[i].uniqueId ==
                           bloc.filteredList[index].uniqueId) {
                         bloc.myCategories[i].delete();
-                        bloc.categoriesBox
-                            .delete(bloc.myCategories[i].uniqueId);
+
+                        locator<HiveService>().deleteValue(
+                            boxName: categoriesHive,
+                            key: bloc.myCategories[i].uniqueId!);
                       }
                     }
-                    bloc.myCategories = bloc.categoriesBox.values.toList();
+                    bloc.myCategories = locator<HiveService>()
+                        .categoriesBox
+                        .values
+                        .map((dynamic item) => item as Categories)
+                        .toList();
                     bloc.fillFilterdList();
 
                     final transactionsToDelete =
@@ -80,8 +98,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
                     for (final transaction in transactionsToDelete) {
                       transaction.category = "";
-                      // widget.expensesBloc.transactionsBox
-                      //     .put(transaction.uniqueId, transaction);
                       locator<HiveService>().setValue(
                           boxName: transactionsHive,
                           key: transaction.uniqueId!,
@@ -133,7 +149,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bloc.myCategories = bloc.categoriesBox.values.toList();
+    bloc.myCategories = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
 
     bloc.fillFilterdList();
 
@@ -147,8 +167,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               ctx: context,
               cat: null,
               onClicked: (value) {
-                bloc.categoriesBox.put(value.uniqueId, value);
-                bloc.myCategories = bloc.categoriesBox.values.toList();
+                locator<HiveService>().setValue(
+                    boxName: categoriesHive,
+                    key: value.uniqueId!,
+                    value: value);
+                bloc.myCategories = locator<HiveService>()
+                    .categoriesBox
+                    .values
+                    .map((dynamic item) => item as Categories)
+                    .toList();
                 widget.expensesBloc.fillCategoryList();
                 bloc.fillFilterdList();
               });
@@ -231,10 +258,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                             .uniqueId) {
                                                       bloc.myCategories[i]
                                                           .delete();
-                                                      bloc.categoriesBox.put(
-                                                          bloc.myCategories[i]
-                                                              .uniqueId,
-                                                          value);
+
+                                                      locator<HiveService>()
+                                                          .setValue(
+                                                              boxName:
+                                                                  categoriesHive,
+                                                              key: value
+                                                                  .uniqueId!,
+                                                              value: value);
 
                                                       value.save();
                                                     }
@@ -252,12 +283,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                                       in transactionsToDelete) {
                                                     transaction.category =
                                                         value.category;
-                                                    // widget.expensesBloc
-                                                    //     .transactionsBox
-                                                    //     .put(
-                                                    //         transaction
-                                                    //             .uniqueId,
-                                                    //         transaction);
+
                                                     locator<HiveService>()
                                                         .setValue(
                                                             boxName:

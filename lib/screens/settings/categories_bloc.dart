@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:hive/hive.dart';
+import 'package:expenses_app/locater.dart';
+import 'package:expenses_app/services/hive_service.dart';
 
+import '../../constants.dart';
 import '../../models/categories.dart';
 
 class CategoriesBloc {
-  final categoriesBox = Hive.box<Categories>('CategoriesHive');
+  // final categoriesBox = Hive.box<Categories>('CategoriesHive');
   StreamController<List<Categories>> categoriesStreamController =
       StreamController<List<Categories>>();
 
@@ -14,8 +16,10 @@ class CategoriesBloc {
 
   List<Categories> myCategories = [];
   get getCategries {
-    final transactionsBox = Hive.box<Categories>('CategoriesHive');
-    myCategories = transactionsBox.values.toList();
+    // final transactionsBox = Hive.box<Categories>('CategoriesHive');
+    // myCategories = transactionsBox.values.toList();
+    myCategories = locator<HiveService>()
+        .getAllValues<Categories>(boxName: categoriesHive) as List<Categories>;
 
     return myCategories;
   }
@@ -24,8 +28,12 @@ class CategoriesBloc {
   List<Categories> filteredList = [];
   fillFilterdList() {
     filteredList = [];
-    myCategories = categoriesBox.values.toList();
-
+    // myCategories = categoriesBox.values.toList();
+    myCategories = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
     if (selectedCategory == "All") {
       filteredList = myCategories;
     } else {

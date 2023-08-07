@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/models/transactions.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import '../../locater.dart';
 import '../../models/categories.dart';
 import '../../models/theme_mode_option_model.dart';
 import '../../services/hive_service.dart';
 
 class ExpensesBloc {
-  // final transactionsBox = Hive.box<Transactions>(TRANSACTIONS_HIVE);
-
   List<Transactions> myExpenses = [];
 
   StreamController<List<Categories>> categoriesStreamController =
@@ -23,8 +20,6 @@ class ExpensesBloc {
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
 
-    // final transactionsBox = Hive.box<Transactions>('wallet_data');
-    // final List<Transactions> myExpenses = transactionsBox.values.toList();
     final List<Transactions> myExpenses = locator<HiveService>()
         .transactionBox
         .values
@@ -57,8 +52,12 @@ class ExpensesBloc {
   }
 
   fillCategoryList() async {
-    var categoriesBox = await Hive.openBox<Categories>("CategoriesHive");
-    categoryList = categoriesBox.values.toList();
+    categoryList = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
+
     categoriesStreamController.sink.add(categoryList);
   }
 
