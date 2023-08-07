@@ -110,12 +110,12 @@ class ExpensesBloc {
 
   fillFilterdList() {
     filteredList = [];
+
     myExpenses = locator<HiveService>()
         .transactionBox
         .values
         .map((dynamic item) => item as Transactions)
         .toList();
-
     if (selectedCategory == "All") {
       filteredList = myExpenses;
     } else {

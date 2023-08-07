@@ -127,42 +127,46 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                           bloc.calculateIncomeOutcome(TransactionType.outcome),
                       pieMap: getCategoryOccurrences(bloc.myExpenses),
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          SizedBox(
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: (bloc.selectedCategory == 'All'
-                                    ? MaterialStateProperty.all(Colors.teal)
-                                    : MaterialStateProperty.all(Colors.white)),
-                              ),
-                              onPressed: () {
-                                bloc.selectedCategory = "All";
-                                bloc.fillFilterdList();
-                                setState(() {});
-                              },
-                              child: Text(
-                                "All",
-                                style: TextStyle(
-                                    color: bloc.appColorTheme.toColor()),
-                                // TextStyle(
-                                //   color: (bloc.selectedCategory ==
-                                //           bloc.categoryList[index]
-                                //               .category
-                                //       ? Colors.white
-                                //       : Colors.teal),
-                                // ),
-                              ),
-                            ),
-                          ),
-                          StreamBuilder<List<Categories>>(
-                              stream: bloc.categoriesStream,
-                              builder: (context, snapshot) {
-                                return SizedBox(
+                    StreamBuilder<List<Categories>>(
+                        stream: bloc.categoriesStream,
+                        builder: (context, snapshot) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          (bloc.selectedCategory == 'All'
+                                              ? MaterialStateProperty.all(
+                                                  Colors.teal)
+                                              : MaterialStateProperty.all(
+                                                  Colors.white)),
+                                    ),
+                                    onPressed: () {
+                                      bloc.selectedCategory = "All";
+                                      bloc.fillFilterdList();
+                                      bloc.fillCategoryList();
+                                      bloc.colorStreamController.sink.add("");
+                                    },
+                                    child: Text(
+                                      "All",
+                                      style: TextStyle(
+                                          color: bloc.appColorTheme.toColor()),
+                                      // TextStyle(
+                                      //   color: (bloc.selectedCategory ==
+                                      //           bloc.categoryList[index]
+                                      //               .category
+                                      //       ? Colors.white
+                                      //       : Colors.teal),
+                                      // ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
                                     height: 50,
                                     child: ListView.builder(
                                         itemCount: snapshot.data?.length ??
@@ -198,7 +202,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                     .categoryList[index]
                                                     .category;
                                                 bloc.fillFilterdList();
-                                                setState(() {});
+                                                bloc.fillCategoryList();
+                                                bloc.colorStreamController.sink
+                                                    .add("");
                                               },
                                               child: Text(
                                                 bloc.categoryList[index]
@@ -218,11 +224,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                           } else {
                                             return Container();
                                           }
-                                        }));
-                              }),
-                        ],
-                      ),
-                    ),
+                                        }))
+                              ],
+                            ),
+                          );
+                        }),
                     bloc.filteredList.isEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(90.0),
