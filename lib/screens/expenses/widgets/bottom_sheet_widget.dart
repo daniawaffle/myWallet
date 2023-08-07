@@ -1,10 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-
 import 'package:expenses_app/models/transactions.dart';
-import 'package:hive/hive.dart';
-
+import '../../../locater.dart';
 import '../../../models/categories.dart';
+import '../../../services/hive_service.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Transactions? trans;
@@ -33,7 +32,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   void initState() {
-    categoryList = Hive.box<Categories>("CategoriesHive").values.toList();
+    categoryList = locator<HiveService>()
+        .categoriesBox
+        .values
+        .map((dynamic item) => item as Categories)
+        .toList();
 
     if (widget.trans != null) {
       priceController.text = widget.trans!.price.toString();
@@ -41,6 +44,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       type = widget.trans!.type;
       isIncome = type == TransactionType.income ? true : false;
       selectedCategory = widget.trans!.category;
+    } else {
+      selectedCategory = categoryList.first.category;
     }
 
     super.initState();

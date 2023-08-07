@@ -16,11 +16,6 @@ Future<void> main() async {
   Hive.registerAdapter(CategoriesAdapter());
   setupLocator();
   await locator<HiveService>().openBoxes();
-
-  // await Hive.openBox<Transactions>('wallet_data');
-  // await Hive.openBox<String>("SettingsHive");
-  // await Hive.openBox<Categories>("CategoriesHive");
-
   if (locator<HiveService>().categoriesBox.isEmpty) {
     List<Categories> categoryList = [
       Categories(
