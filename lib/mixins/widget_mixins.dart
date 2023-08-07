@@ -1,7 +1,10 @@
+import 'package:expenses_app/constants.dart';
 import 'package:flutter/material.dart';
+import '../locater.dart';
 import '../models/transactions.dart';
 import '../screens/expenses/expenses_bloc.dart';
 import '../screens/expenses/widgets/bottom_sheet_widget.dart';
+import '../services/hive_service.dart';
 
 mixin WidgetsMixin {
   deleteAlert(int index, BuildContext context, ExpensesBloc bloc) {
@@ -20,17 +23,26 @@ mixin WidgetsMixin {
             actions: [
               TextButton(
                   onPressed: () {
-                    bloc.myExpenses = bloc.transactionsBox.values.toList();
+                    bloc.myExpenses = locator<HiveService>()
+                        .transactionBox
+                        .values
+                        .toList() as List<Transactions>;
 
                     for (int i = 0; i < bloc.myExpenses.length; i++) {
                       if (bloc.myExpenses[i].uniqueId ==
                           bloc.filteredList[index].uniqueId) {
                         bloc.myExpenses[i].delete();
-                        bloc.transactionsBox
-                            .delete(bloc.myExpenses[i].uniqueId);
+                        // bloc.transactionsBox
+                        //     .delete(bloc.myExpenses[i].uniqueId);
+                        locator<HiveService>().deleteValue(
+                            boxName: transactionsHive,
+                            key: bloc.myExpenses[i].uniqueId!);
                       }
                     }
-                    bloc.myExpenses = bloc.transactionsBox.values.toList();
+                    bloc.myExpenses = locator<HiveService>()
+                        .transactionBox
+                        .values
+                        .toList() as List<Transactions>;
                     bloc.fillFilterdList();
                     Navigator.pop(context);
                   },

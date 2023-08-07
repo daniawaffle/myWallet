@@ -9,11 +9,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  get_it:
   hive:
   hive_flutter:
   uuid: ^3.0.7
   provider: ^6.0.1
   pie_chart: ^5.1.0
+  firebase_core: ^2.15.0
 
 dev_dependencies:
   flutter_test:

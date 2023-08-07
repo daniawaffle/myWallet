@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "555858453445",
+    "project_id": "my-wallet-firebase",
+    "storage_bucket": "my-wallet-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555858453445:android:adac54ff85d8d60da6e1ac",
+        "android_client_info": {
+          "package_name": "com.example.expenses_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555858453445-9luneoainjl8c25t4e36pbd6coq8otsd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBioxOVSrQwIP0psYVq7zc-lsz5oPFsgPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555858453445-9luneoainjl8c25t4e36pbd6coq8otsd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

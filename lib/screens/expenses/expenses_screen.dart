@@ -1,3 +1,4 @@
+import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/extentions.dart';
 import 'package:expenses_app/models/categories.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:expenses_app/mixins/widget_mixins.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
 import 'package:expenses_app/models/transactions.dart';
 import 'package:expenses_app/screens/expenses/widgets/wallet.dart';
+import '../../locater.dart';
+import '../../services/hive_service.dart';
 import '../settings/settings_screen.dart';
 
 class ExpensesScreen extends StatefulWidget with WidgetsMixin {
@@ -20,13 +23,27 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
   @override
   void initState() {
     bloc.fillCategoryList();
-    bloc.myExpenses = bloc.transactionsBox.values.toList();
+    bloc.myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
     bloc.fillFilterdList();
+    _initSavedLanguageValue();
+    setState(() {});
     super.initState();
   }
 
+  Future<void> _initSavedLanguageValue() async {
+    await bloc.refreshColorStream();
+    setState(() {});
+  }
+
   Map<String, double> getCategoryOccurrences(List<Transactions> transactions) {
-    final List<Transactions> myExpenses = bloc.transactionsBox.values.toList();
+    final List<Transactions> myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .toList() as List<Transactions>;
     Map<String, double> dataMap = {};
 
     for (Transactions transaction in myExpenses) {
@@ -39,7 +56,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
 
   @override
   Widget build(BuildContext context) {
-    bloc.myExpenses = bloc.transactionsBox.values.toList();
+    bloc.myExpenses = locator<HiveService>()
+        .transactionBox
+        .values
+        .map((dynamic item) => item as Transactions)
+        .toList();
     // bloc.fillFilterdList();
 
     return StreamBuilder<String>(
@@ -60,9 +81,16 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                         ctx: context,
                         trans: null,
                         onClicked: (value) {
-                          bloc.transactionsBox.put(value.uniqueId, value);
-                          bloc.myExpenses =
-                              bloc.transactionsBox.values.toList();
+                          // bloc.transactionsBox.put(value.uniqueId, value);
+                          locator<HiveService>().setValue(
+                              boxName: transactionsHive,
+                              key: value.uniqueId!,
+                              value: value);
+
+                          bloc.myExpenses = locator<HiveService>()
+                              .transactionBox
+                              .values
+                              .toList() as List<Transactions>;
 
                           bloc.fillFilterdList();
                           setState(() {});
@@ -99,41 +127,46 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                           bloc.calculateIncomeOutcome(TransactionType.outcome),
                       pieMap: getCategoryOccurrences(bloc.myExpenses),
                     ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 50,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: (bloc.selectedCategory == 'All'
-                                    ? MaterialStateProperty.all(Colors.teal)
-                                    : MaterialStateProperty.all(Colors.white)),
-                              ),
-                              onPressed: () {
-                                bloc.selectedCategory = "All";
-                                bloc.fillFilterdList();
-                                setState(() {});
-                              },
-                              child: Text(
-                                "All",
-                                style: TextStyle(
-                                    color: bloc.appColorTheme.toColor()),
-                                // TextStyle(
-                                //   color: (bloc.selectedCategory ==
-                                //           bloc.categoryList[index]
-                                //               .category
-                                //       ? Colors.white
-                                //       : Colors.teal),
-                                // ),
-                              ),
-                            ),
-                          ),
-                          StreamBuilder<List<Categories>>(
-                              stream: bloc.categoriesStream,
-                              builder: (context, snapshot) {
-                                return SizedBox(
+                    StreamBuilder<List<Categories>>(
+                        stream: bloc.categoriesStream,
+                        builder: (context, snapshot) {
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      backgroundColor:
+                                          (bloc.selectedCategory == 'All'
+                                              ? MaterialStateProperty.all(
+                                                  Colors.teal)
+                                              : MaterialStateProperty.all(
+                                                  Colors.white)),
+                                    ),
+                                    onPressed: () {
+                                      bloc.selectedCategory = "All";
+                                      bloc.fillFilterdList();
+                                      bloc.fillCategoryList();
+                                      bloc.colorStreamController.sink.add("");
+                                    },
+                                    child: Text(
+                                      "All",
+                                      style: TextStyle(
+                                          color: bloc.appColorTheme.toColor()),
+                                      // TextStyle(
+                                      //   color: (bloc.selectedCategory ==
+                                      //           bloc.categoryList[index]
+                                      //               .category
+                                      //       ? Colors.white
+                                      //       : Colors.teal),
+                                      // ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
                                     height: 50,
                                     child: ListView.builder(
                                         itemCount: snapshot.data?.length ??
@@ -169,7 +202,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                     .categoryList[index]
                                                     .category;
                                                 bloc.fillFilterdList();
-                                                setState(() {});
+                                                bloc.fillCategoryList();
+                                                bloc.colorStreamController.sink
+                                                    .add("");
                                               },
                                               child: Text(
                                                 bloc.categoryList[index]
@@ -189,11 +224,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                           } else {
                                             return Container();
                                           }
-                                        }));
-                              }),
-                        ],
-                      ),
-                    ),
+                                        }))
+                              ],
+                            ),
+                          );
+                        }),
                     bloc.filteredList.isEmpty
                         ? Padding(
                             padding: const EdgeInsets.all(90.0),
@@ -287,13 +322,22 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                               .uniqueId) {
                                                         bloc.myExpenses[i]
                                                             .delete();
-                                                        bloc.transactionsBox
-                                                            .put(
-                                                                bloc
+                                                        // bloc.transactionsBox
+                                                        //     .put(
+                                                        //         bloc
+                                                        //             .myExpenses[
+                                                        //                 i]
+                                                        //             .uniqueId,
+                                                        //         value);
+                                                        locator<HiveService>()
+                                                            .setValue(
+                                                                boxName:
+                                                                    transactionsHive,
+                                                                key: bloc
                                                                     .myExpenses[
                                                                         i]
-                                                                    .uniqueId,
-                                                                value);
+                                                                    .uniqueId!,
+                                                                value: value);
 
                                                         value.save();
                                                       }
