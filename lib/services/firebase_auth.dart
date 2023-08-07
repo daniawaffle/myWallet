@@ -15,12 +15,16 @@ class FirebaseAuthService {
   }
 
   Future<UserCredential?> signInWithEmailAndPassword(AppUser appUser) async {
+    // return await _auth.signInWithEmailAndPassword(
+    //     email: appUser.email, password: appUser.password);
     try {
       return await _auth.signInWithEmailAndPassword(
           email: appUser.email, password: appUser.password);
-    } catch (e) {
-      print("Error during sign-in: $e");
-      return null;
+    } on FirebaseAuthException catch (e) {
+      throw FirebaseAuthException(
+        message: e.message,
+        code: e.code,
+      );
     }
   }
 

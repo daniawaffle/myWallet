@@ -1,6 +1,10 @@
 import 'package:expenses_app/extentions.dart';
+import 'package:expenses_app/models/user.dart';
+import 'package:expenses_app/screens/expenses/expenses_screen.dart';
 import 'package:expenses_app/screens/login/login_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,9 +14,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final formkey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   LoginBloc bloc = LoginBloc();
   @override
   Widget build(BuildContext context) {
@@ -37,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             Form(
-                key: formkey,
+                key: bloc.formkey,
                 child: Column(
                   children: <Widget>[
                     Padding(
@@ -106,9 +110,29 @@ class _LoginScreenState extends State<LoginScreen> {
               decoration: BoxDecoration(
                   color: Colors.blue, borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
-                onPressed: () {
-                  if (formkey.currentState!.validate()) {
-                    return;
+                onPressed: () async {
+                  if (bloc.formkey.currentState!.validate()) {
+                    // try {
+                    //   bloc.loginToFirebase(
+                    //       emailController.text, passwordController.text);
+                    // } on FirebaseAuthException catch (error) {
+                    //   Fluttertoast.showToast(
+                    //       msg: error.message!, gravity: ToastGravity.TOP);
+                    // }
+                    try {
+                      await bloc.authService.signInWithEmailAndPassword(AppUser(
+                          email: emailController.text,
+                          password: passwordController.text));
+                      if (context.mounted) {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => const ExpensesScreen()));
+                      }
+                    } on FirebaseAuthException catch (error) {
+                      Fluttertoast.showToast(
+                        msg: error.message!,
+                        gravity: ToastGravity.BOTTOM,
+                      );
+                    }
                   }
                 },
                 child: const Text(
