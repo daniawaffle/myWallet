@@ -1,9 +1,8 @@
 import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/firebase_options.dart';
+import 'package:expenses_app/screens/login/login_screen.dart';
 import 'package:expenses_app/services/hive_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-import '/screens/expenses/expenses_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'locater.dart';
@@ -60,7 +59,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: ExpensesScreen(),
+      // home: ExpensesScreen(),
+      home: LoginScreen(),
     );
   }
 }
