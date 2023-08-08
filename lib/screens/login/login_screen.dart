@@ -1,7 +1,7 @@
-import 'package:expenses_app/extentions.dart';
-import 'package:expenses_app/models/user.dart';
 import 'package:expenses_app/screens/expenses/expenses_screen.dart';
+import 'package:expenses_app/screens/forgot_password/forgot_password_screen.dart';
 import 'package:expenses_app/screens/login/login_bloc.dart';
+import 'package:expenses_app/screens/signup/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -24,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Login Page"),
+        backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 60.0),
               child: Center(
-                child: Container(
+                child: SizedBox(
                     width: 200,
                     height: 150,
                     /*decoration: BoxDecoration(
@@ -48,21 +49,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: TextFormField(
-                        controller: emailController,
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Email',
-                            hintText: 'Enter valid email id as abc@gmail.com'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please Enter E-mail';
-                          } else if (!value.isValidEmail()) {
-                            return 'enter a valid email format';
-                          } else {
-                            return null;
-                          }
-                        },
-                      ),
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'Email',
+                              hintText:
+                                  'Enter valid email id as abc@gmail.com'),
+                          validator: (value) {
+                            return bloc.validateEmail(value);
+                          }),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
@@ -72,13 +67,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context, snapshot) {
                             return TextFormField(
                                 controller: passwordController,
-                                obscureText: true,
+                                obscureText: !bloc.isPasswordVisable,
                                 decoration: InputDecoration(
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
                                     labelText: 'Password',
                                     hintText: 'Enter secure password',
                                     suffix: InkWell(
-                                      onTap: () {},
+                                      onTap: () {
+                                        bloc.togglePasswordVisibility();
+                                      },
                                       child: Text(
                                         bloc.isPasswordVisable
                                             ? "Hide"
@@ -94,22 +91,37 @@ class _LoginScreenState extends State<LoginScreen> {
                 )),
             InkWell(
               onTap: () {
-                //TODO FORGOT PASSWORD SCREEN GOES HERE
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ForgotPasswordScreen()));
               },
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: const Text(
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
                   'Forgot Password',
                   style: TextStyle(color: Colors.blue, fontSize: 15),
                 ),
               ),
             ),
-            Container(
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const SignupScreen()));
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  'Signup',
+                  style: TextStyle(color: Colors.blue, fontSize: 15),
+                ),
+              ),
+            ),
+            SizedBox(
               height: 50,
               width: 250,
-              decoration: BoxDecoration(
-                  color: Colors.blue, borderRadius: BorderRadius.circular(20)),
               child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                ),
                 onPressed: () async {
                   if (bloc.formkey.currentState!.validate()) {
                     // try {
@@ -120,9 +132,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     //       msg: error.message!, gravity: ToastGravity.TOP);
                     // }
                     try {
-                      await bloc.authService.signInWithEmailAndPassword(AppUser(
-                          email: emailController.text,
-                          password: passwordController.text));
+                      await bloc.loginToFirebase(
+                          emailController.text, passwordController.text);
                       if (context.mounted) {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
                             builder: (context) => const ExpensesScreen()));
@@ -141,10 +152,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 130,
-            ),
-            const Text('New User? Create Account')
           ],
         ),
       ),

@@ -9,8 +9,7 @@ class FirebaseAuthService {
       return await _auth.createUserWithEmailAndPassword(
           email: appUser.email, password: appUser.password);
     } catch (e) {
-      print("Error during registration: $e");
-      return null;
+      rethrow;
     }
   }
 
@@ -30,6 +29,14 @@ class FirebaseAuthService {
 
   Future<void> signOut() async {
     await _auth.signOut();
+  }
+
+  Future<void> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
