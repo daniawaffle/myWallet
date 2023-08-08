@@ -21,6 +21,9 @@ dependencies:
   fluttertoast: ^8.2.2
   firebase_database: ^10.2.4
   cloud_firestore: ^4.8.4
+  flutter_localizations: 
+    sdk: flutter
+  localization: ^2.1.0
 
 dev_dependencies:
   flutter_test:

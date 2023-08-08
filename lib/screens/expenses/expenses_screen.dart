@@ -224,8 +224,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                                       .add("");
                                                 },
                                                 label: Text(
-                                                  bloc.categoryList[index]
-                                                      .category,
+                                                  documentSnapshot['category']
+                                                      as String,
                                                   style: TextStyle(
                                                       color: bloc.appColorTheme
                                                           .toColor()),

@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:expenses_app/models/transactions.dart';
 import '../../../locater.dart';
@@ -25,6 +26,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descController = TextEditingController();
 
+  final db = FirebaseFirestore.instance;
+  final CollectionReference categories =
+      FirebaseFirestore.instance.collection('categories');
+
   bool isIncome = true;
   String? selectedCategory;
 
@@ -45,7 +50,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       isIncome = type == TransactionType.income ? true : false;
       selectedCategory = widget.trans!.category;
     } else {
-      selectedCategory = categoryList.first.category;
+      // selectedCategory = categoryList.first.category;
+      selectedCategory = '';
     }
 
     super.initState();
@@ -111,34 +117,91 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   ],
                 ),
                 const Divider(),
-                DropdownButtonFormField(
-                  value: categoryList.any(
-                          (element) => element.category == selectedCategory)
-                      ? categoryList.firstWhere(
-                          (element) => element.category == selectedCategory)
-                      : categoryList.isNotEmpty
-                          ? categoryList.first
-                          : null,
-                  hint: const Text("Select Value"),
-                  items: categoryList.map((Categories? category) {
-                    return DropdownMenuItem<Categories>(
-                      value: category,
-                      child: Row(
-                        children: [
-                          // Icon(Icons.abc),
-                          const SizedBox(width: 8),
-                          Text(category!.category),
-                        ],
+                FutureBuilder<QuerySnapshot>(
+                  future:
+                      FirebaseFirestore.instance.collection('categories').get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    }
+
+                    if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    // Data snapshot from Firestore
+                    QuerySnapshot querySnapshot = snapshot.data!;
+
+                    // Extract category data for dropdown
+                    List<String> categories = querySnapshot.docs
+                        .map((doc) => doc['category'] as String)
+                        .toList();
+
+                    List<int> icons = querySnapshot.docs
+                        .map((doc) => doc['categoryIconCode'] as int)
+                        .toList();
+                    return DropdownButtonFormField<String>(
+                      value: selectedCategory!.isEmpty
+                          ? null
+                          : selectedCategory, // Initial value (you can set a default)
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedCategory = newValue;
+                        });
+                      },
+                      hint: const Text("Select Category"),
+                      validator: (value) =>
+                          value == null ? 'field required' : null,
+
+                      items: List<DropdownMenuItem<String>>.generate(
+                        categories.length,
+                        (index) {
+                          return DropdownMenuItem<String>(
+                            value: categories[index],
+                            child: Row(
+                              children: [
+                                Icon(
+                                  IconData(icons[index],
+                                      fontFamily: 'MaterialIcons'),
+                                  color: Colors.teal,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(categories[index]),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     );
-                  }).toList(),
-                  validator: (value) => value == null ? 'field required' : null,
-                  onChanged: (newValue) {
-                    setState(() {
-                      selectedCategory = newValue!.category;
-                    });
                   },
                 ),
+                // DropdownButtonFormField(
+                //   value: categoryList.any(
+                //           (element) => element.category == selectedCategory)
+                //       ? categoryList.firstWhere(
+                //           (element) => element.category == selectedCategory)
+                //       : categoryList.isNotEmpty
+                //           ? categoryList.first
+                //           : null,
+                //   hint: const Text("Select Value"),
+                //   items: categoryList.map((Categories? category) {
+                //     return DropdownMenuItem<Categories>(
+                //       value: category,
+                //       child: Row(
+                //         children: [
+                //           const SizedBox(width: 8),
+                //           Text(category!.category),
+                //         ],
+                //       ),
+                //     );
+                //   }).toList(),
+                //   validator: (value) => value == null ? 'field required' : null,
+                //   onChanged: (newValue) {
+                //     setState(() {
+                //       selectedCategory = newValue!.category;
+                //     });
+                //   },
+                // ),
                 TextFormField(
                   controller: priceController,
                   validator: (value) {
