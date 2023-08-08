@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/extentions.dart';
-import 'package:expenses_app/models/categories.dart';
 import 'package:flutter/material.dart';
 import 'package:expenses_app/mixins/widget_mixins.dart';
 import 'package:expenses_app/screens/expenses/expenses_bloc.dart';
@@ -127,9 +127,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                           bloc.calculateIncomeOutcome(TransactionType.outcome),
                       pieMap: getCategoryOccurrences(bloc.myExpenses),
                     ),
-                    StreamBuilder<List<Categories>>(
-                        stream: bloc.categoriesStream,
-                        builder: (context, snapshot) {
+                    StreamBuilder(
+                        stream: bloc.categories.snapshots(),
+                        builder: (context,
+                            AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -156,75 +157,84 @@ class _ExpensesScreenState extends State<ExpensesScreen> with WidgetsMixin {
                                       "All",
                                       style: TextStyle(
                                           color: bloc.appColorTheme.toColor()),
-                                      // TextStyle(
-                                      //   color: (bloc.selectedCategory ==
-                                      //           bloc.categoryList[index]
-                                      //               .category
-                                      //       ? Colors.white
-                                      //       : Colors.teal),
-                                      // ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                    height: 50,
-                                    child: ListView.builder(
-                                        itemCount: snapshot.data?.length ??
-                                            bloc.categoryList.length,
-                                        shrinkWrap: true,
-                                        scrollDirection: Axis.horizontal,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          if (snapshot.data != null) {
-                                            return ElevatedButton(
-                                              // icon: Icon(
-                                              //   Icons.abc,
-                                              //   // bloc.categoryList[index].categoryIcon,
-                                              //   color: (bloc.selectedCategory ==
-                                              //           bloc.categoryList[index]
-                                              //               .category
-                                              //       ? Colors.white
-                                              //       : Colors.teal),
-                                              // ),
-
-                                              style: ButtonStyle(
-                                                backgroundColor: (bloc
-                                                            .selectedCategory ==
-                                                        bloc.categoryList[index]
-                                                            .category
-                                                    ? MaterialStateProperty.all(
-                                                        Colors.teal)
-                                                    : MaterialStateProperty.all(
-                                                        Colors.white)),
-                                              ),
-                                              onPressed: () {
-                                                bloc.selectedCategory = bloc
-                                                    .categoryList[index]
-                                                    .category;
-                                                bloc.fillFilterdList();
-                                                bloc.fillCategoryList();
-                                                bloc.colorStreamController.sink
-                                                    .add("");
-                                              },
-                                              child: Text(
-                                                bloc.categoryList[index]
-                                                    .category,
-                                                style: TextStyle(
-                                                    color: bloc.appColorTheme
-                                                        .toColor()),
-                                                // TextStyle(
-                                                //   color: (bloc.selectedCategory ==
-                                                //           bloc.categoryList[index]
-                                                //               .category
-                                                //       ? Colors.white
-                                                //       : Colors.teal),
-                                                // ),
-                                              ),
-                                            );
-                                          } else {
-                                            return Container();
-                                          }
-                                        }))
+                                if (streamSnapshot.hasData)
+                                  SizedBox(
+                                      height: 50,
+                                      child: ListView.builder(
+                                          itemCount:
+                                              streamSnapshot.data!.docs.length,
+                                          //     ??
+                                          // bloc.categoryList.length,
+                                          shrinkWrap: true,
+                                          scrollDirection: Axis.horizontal,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            final DocumentSnapshot
+                                                documentSnapshot =
+                                                streamSnapshot
+                                                    .data!.docs[index];
+                                            if (snapshot.data != null) {
+                                              return ElevatedButton.icon(
+                                                icon: Icon(
+                                                  IconData(
+                                                      documentSnapshot[
+                                                              'categoryIconCode']
+                                                          as int,
+                                                      fontFamily:
+                                                          'MaterialIcons'),
+                                                  color: (bloc
+                                                              .selectedCategory ==
+                                                          // bloc
+                                                          //     .categoryList[
+                                                          //         index]
+                                                          //     .category
+                                                          documentSnapshot[
+                                                              'category']
+                                                      ? Colors.white
+                                                      : Colors.teal),
+                                                ),
+                                                style: ButtonStyle(
+                                                  backgroundColor: (bloc
+                                                              .selectedCategory ==
+                                                          // bloc
+                                                          //     .categoryList[
+                                                          //         index]
+                                                          //     .category
+                                                          documentSnapshot[
+                                                              'category']
+                                                      ? MaterialStateProperty
+                                                          .all(Colors.teal)
+                                                      : MaterialStateProperty
+                                                          .all(Colors.white)),
+                                                ),
+                                                onPressed: () {
+                                                  bloc.selectedCategory =
+                                                      // bloc
+                                                      //     .categoryList[index]
+                                                      //     .category;
+                                                      documentSnapshot[
+                                                          'category'];
+                                                  bloc.fillFilterdList();
+                                                  bloc.fillCategoryList();
+                                                  bloc.colorStreamController
+                                                      .sink
+                                                      .add("");
+                                                },
+                                                label: Text(
+                                                  bloc.categoryList[index]
+                                                      .category,
+                                                  style: TextStyle(
+                                                      color: bloc.appColorTheme
+                                                          .toColor()),
+                                                ),
+                                              );
+                                            } else {
+                                              return Container();
+                                            }
+                                          }))
                               ],
                             ),
                           );

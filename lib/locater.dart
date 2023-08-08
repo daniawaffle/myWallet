@@ -5,4 +5,6 @@ GetIt locator = GetIt.instance;
 
 void setupLocator() {
   locator.registerLazySingleton(() => HiveService());
+  // locator.registerLazySingleton<FirebaseRealtimeService>(
+  //     () => FirebaseRealtimeService());
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expenses_app/constants.dart';
 import 'package:expenses_app/models/transactions.dart';
 import '../../locater.dart';
@@ -8,7 +9,7 @@ import '../../services/hive_service.dart';
 
 class ExpensesBloc {
   List<Transactions> myExpenses = [];
-
+// Add an instance of FirebaseRealtimeService
   StreamController<List<Categories>> categoriesStreamController =
       StreamController<List<Categories>>();
   Stream<List<Categories>> get categoriesStream =>
@@ -16,6 +17,9 @@ class ExpensesBloc {
 
   StreamController<String> colorStreamController = StreamController<String>();
   Stream<String> get colorsStream => colorStreamController.stream;
+
+  final CollectionReference categories =
+      FirebaseFirestore.instance.collection('categories');
 
   double calculateIncomeOutcome(TransactionType type) {
     double totalMoney = 0;
@@ -38,7 +42,6 @@ class ExpensesBloc {
   String appColorTheme = "#000000";
 
   List<Categories> categoryList = [];
-
   refreshColorStream() async {
     // final settingsLocator = SettingsLocater();
     // await settingsLocator.init();

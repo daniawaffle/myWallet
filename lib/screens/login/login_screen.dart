@@ -16,8 +16,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
   LoginBloc bloc = LoginBloc();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          left: 15.0, right: 15.0, top: 15, bottom: 0),
+                          left: 15.0, right: 15.0, top: 15, bottom: 10),
                       child: StreamBuilder<bool>(
                           stream: bloc.passStreamController.stream,
                           builder: (context, snapshot) {
@@ -89,32 +94,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 )),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ForgotPasswordScreen()));
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  'Forgot Password',
-                  style: TextStyle(color: Colors.blue, fontSize: 15),
-                ),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const SignupScreen()));
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text(
-                  'Signup',
-                  style: TextStyle(color: Colors.blue, fontSize: 15),
-                ),
-              ),
-            ),
             SizedBox(
               height: 50,
               width: 250,
@@ -149,6 +128,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text(
                   'Login',
                   style: TextStyle(color: Colors.white, fontSize: 25),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const ForgotPasswordScreen()));
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  'Forgot Password',
+                  style: TextStyle(color: Colors.blue, fontSize: 15),
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const SignupScreen()));
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                  'Register',
+                  style: TextStyle(color: Colors.blue, fontSize: 15),
                 ),
               ),
             ),

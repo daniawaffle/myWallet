@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:expenses_app/extentions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-
 import '../../models/user.dart';
 import '../../services/firebase_auth.dart';
 
